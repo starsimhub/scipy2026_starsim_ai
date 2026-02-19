@@ -18,7 +18,9 @@ Track: **Data-Driven Discovery, Machine Learning and Artificial Intelligence**
 
 ## Evaluation Dataset
 
-Our evaluation benchmark follows the structure of [SciCode](https://arxiv.org/abs/2407.13168), adapted for disease modeling with [Starsim](https://github.com/starsimhub/starsim).
+Our evaluation benchmark follows the structure of [SciCode](https://arxiv.org/abs/2407.13168), adapted for disease modeling with [Starsim](https://github.com/starsimhub/starsim). A central goal of this benchmark is to measure how well an agent can **leverage Starsim as a library** to solve modeling problems, rather than writing disease models from scratch. Agents that effectively use Starsim's built-in components (e.g., `ss.SIR`, `ss.Vaccine`, contact networks) demonstrate the kind of library fluency that matters in practice.
+
+To assess this, we depart from SciCode in one key way: in addition to test-case validation, we use an **LLM-judge assessment** to evaluate whether the agent's solution actually uses Starsim APIs. This catches cases where an agent produces numerically correct output but bypasses Starsim entirely (e.g., by implementing ODE solvers from scratch). The judge reviews the generated code and scores it on Starsim API usage, idiomatic patterns, and appropriate use of library abstractions.
 
 ### Problem Structure
 
@@ -63,6 +65,18 @@ Following SciCode, we support multiple evaluation configurations:
 | **With background** | Yes | Model-generated | Measures instruction-following |
 | **Gold prior** | No | Gold solutions | Isolates per-step capability |
 | **With background + gold prior** | Yes | Gold solutions | Easiest setting |
+
+### Evaluation Criteria
+
+Each solution is assessed on two axes:
+
+1. **Correctness** — Does the solution pass the test cases? (Same as SciCode.)
+2. **Starsim utilization** — Does the solution use Starsim effectively? An LLM judge reviews the generated code and scores it on:
+   - Whether core Starsim APIs are used (e.g., `ss.Sim`, `ss.SIR`, `ss.Network`)
+   - Whether library abstractions are used appropriately (e.g., using `ss.Vaccine` instead of manually modifying susceptibility)
+   - Whether the code follows idiomatic Starsim patterns
+
+A solution that passes all test cases but doesn't use Starsim would score high on correctness but low on utilization. The benchmark is designed to reward agents that can learn and apply a domain library, not just produce correct numerical output.
 
 ### Problem Domains
 
