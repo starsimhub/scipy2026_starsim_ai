@@ -26,6 +26,8 @@ import httpx
 import pytest
 from httpx_sse import connect_sse
 
+pytestmark = pytest.mark.uses_llm
+
 JSONRPC_VERSION = "2.0"
 PORT = 9100
 BASE_URL = f"http://localhost:{PORT}"
