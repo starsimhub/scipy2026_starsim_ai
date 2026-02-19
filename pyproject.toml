@@ -10,7 +10,10 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-scipy2026-starsim-ai = "scipy2026_starsim_ai:main"
+scipy2026-starsim-ai = "ssai:main"
+
+[tool.uv.build-backend]
+module-name = "ssai"
 
 [build-system]
 requires = ["uv_build>=0.9.10,<0.10.0"]
