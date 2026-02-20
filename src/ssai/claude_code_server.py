@@ -9,6 +9,7 @@ Run:
 from __future__ import annotations
 
 import logging
+import os
 import click
 import uvicorn
 
@@ -147,6 +148,8 @@ def main(
     mcp_servers: tuple[str, ...],
 ):
     """Start the Claude Code A2A server."""
+
+    model = model or os.environ.get("CLAUDE_MODEL") or None
 
     config = ClaudeCodeConfig(
         workspace_root=workspace,
