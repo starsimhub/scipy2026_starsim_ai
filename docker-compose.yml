@@ -1,0 +1,7 @@
+services:
+  agent:
+    build: .
+    ports:
+      - "9100:9100"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

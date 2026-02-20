@@ -161,7 +161,13 @@ Features:
 
 ### Running the evaluation
 
-The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure LLM performance on the Starsim problem set.
+The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure performance on the Starsim problem set. There are two evaluation modes: **LLM** (one-shot generation) and **Agent** (iterative via the Claude Code A2A server).
+
+Set your API key via environment variable or a `.env` file (loaded automatically via python-dotenv). See [`eval/llm/README.md`](eval/llm/README.md) for the full list of options.
+
+#### LLM evaluation (one-shot)
+
+Tests a model's ability to generate correct Starsim code in a single attempt:
 
 ```bash
 # Run the full benchmark
@@ -174,7 +180,29 @@ inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --te
 inspect eval eval/llm/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
 ```
 
-Set your API key via environment variable or a `.env` file (loaded automatically via python-dotenv). See [`eval/llm/README.md`](eval/llm/README.md) for the full list of options.
+#### Agent evaluation (iterative)
+
+Tests an agent's ability to iteratively write, test, and debug Starsim code. Problems are sent to the Claude Code A2A server, which can execute code, observe errors, and refine its solution. The agent receives test cases in the prompt so it can self-test.
+
+```bash
+# Start the A2A server (or use Docker, see below)
+start-claude-code-server --port 9100 --workspace ./workspaces
+
+# Run the agent eval
+inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+
+# Run a single tutorial
+inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100 -T tutorial=starsim_t1
+```
+
+To run the A2A server in Docker for filesystem isolation:
+
+```bash
+ANTHROPIC_API_KEY=sk-... docker compose up --build
+
+# Then run the eval against it
+inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+```
 
 ### Running tests
 
