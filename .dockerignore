@@ -1,0 +1,10 @@
+# Exclude evaluation code and problem answers from the agent container
+problems/
+eval/
+tests/
+uv.lock
+.python-version
+.git/
+__pycache__/
+*.pyc
+.env

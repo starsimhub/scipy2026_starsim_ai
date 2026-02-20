@@ -10,24 +10,23 @@ RUN apt-get update && \
 # Install the Claude Code CLI globally
 RUN npm install -g @anthropic-ai/claude-code
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
 WORKDIR /app
 
-# Copy dependency files first for layer caching
-COPY README.md pyproject.toml uv.lock .python-version ./
+# Install only the runtime dependencies needed by the A2A server + starsim
+RUN pip install --no-cache-dir \
+    a2a-sdk \
+    claude-agent-sdk \
+    click \
+    uvicorn \
+    typing_extensions \
+    fastmcp \
+    starsim
 
-# Install dependencies
-RUN uv sync --frozen --no-install-project
-
-# Copy project source
+# Copy only the A2A server source (no eval code, no problems/answers)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+COPY README.md pyproject.toml ./
 COPY src/ src/
-COPY eval/ eval/
-COPY problems/ problems/
-
-# Install the project itself
-RUN uv sync --frozen
+RUN uv pip install --no-deps -e . --system
 
 # Create non-root user (claude CLI refuses bypassPermissions as root)
 RUN useradd -m -s /bin/bash agent
@@ -37,4 +36,4 @@ USER agent
 
 EXPOSE 9100
 
-ENTRYPOINT ["uv", "run", "start-claude-code-server", "--host", "0.0.0.0", "--port", "9100", "--workspace", "/home/agent/workspaces"]
+ENTRYPOINT ["start-claude-code-server", "--host", "0.0.0.0", "--port", "9100", "--workspace", "/home/agent/workspaces"]

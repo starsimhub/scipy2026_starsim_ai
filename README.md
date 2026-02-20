@@ -201,7 +201,7 @@ To run the A2A server in Docker for filesystem isolation:
 ANTHROPIC_API_KEY=sk-... docker compose up --build
 
 # Specify the Claude model (defaults to the Claude Code CLI default)
-ANTHROPIC_API_KEY=sk-... CLAUDE_MODEL=claude-sonnet-4-6 docker compose up --build
+ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY CLAUDE_MODEL=claude-sonnet-4-6 docker compose up --build
 
 # Then run the eval against it
 inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
