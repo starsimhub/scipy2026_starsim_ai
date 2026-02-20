@@ -20,7 +20,7 @@ Options:
     -T tutorial=<id>             Run only a specific tutorial, e.g. "starsim_t1"
     -T with_background=True      Include background context in prompts (default: True)
     -T timeout=60                Timeout in seconds for test execution (default: 60)
-    -T request_timeout=300       HTTP timeout for agent requests (default: 300)
+    -T request_timeout=600       HTTP timeout for agent requests (default: 600)
 """
 
 from dotenv import load_dotenv
@@ -146,7 +146,7 @@ def _extract_a2a_response(data: dict) -> str:
 def a2a_agent_solver(
     agent_url: str = "http://localhost:9100",
     with_background: bool = True,
-    request_timeout: int = 300,
+    request_timeout: int = 600,
 ):
     """Solver that sends problems to a Claude Code A2A server."""
 
@@ -175,10 +175,30 @@ def a2a_agent_solver(
 
         payload = _make_a2a_request(prompt)
 
-        async with httpx.AsyncClient(timeout=request_timeout) as client:
-            resp = await client.post(agent_url, json=payload)
-            resp.raise_for_status()
-            data = resp.json()
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            try:
+                async with httpx.AsyncClient(timeout=request_timeout) as client:
+                    resp = await client.post(agent_url, json=payload)
+                    resp.raise_for_status()
+                    data = resp.json()
+                break
+            except httpx.TimeoutException as exc:
+                if attempt < max_retries:
+                    logger.warning(
+                        "Timeout for %s (attempt %d/%d): %s — retrying",
+                        meta["sub_step_id"],
+                        attempt,
+                        max_retries,
+                        exc,
+                    )
+                else:
+                    logger.error(
+                        "Timeout for %s after %d attempts — giving up",
+                        meta["sub_step_id"],
+                        max_retries,
+                    )
+                    raise
 
         response_text = _extract_a2a_response(data)
 
@@ -233,7 +253,7 @@ def starsim_agent_benchmark(
     tutorial: str | None = None,
     with_background: bool = True,
     timeout: int = 60,
-    request_timeout: int = 300,
+    request_timeout: int = 600,
 ) -> Task:
     """Starsim agent coding evaluation benchmark.
 
