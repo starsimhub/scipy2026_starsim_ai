@@ -149,6 +149,23 @@ Features:
 - Browse individual sub-steps with full descriptions, background context, function signatures, docstrings, and test cases
 - Toggle **Show gold solution** to reveal the reference implementation
 
+### Running the evaluation
+
+The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure LLM performance on the Starsim problem set.
+
+```bash
+# Run the full benchmark
+inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
+
+# Run a single tutorial
+inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0 -T tutorial=starsim_t1
+
+# Run without background context
+inspect eval eval/llm/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
+```
+
+Set your API key via environment variable or a `.env` file (loaded automatically via python-dotenv). See [`eval/llm/README.md`](eval/llm/README.md) for the full list of options.
+
 ### Running tests
 
 ```bash
