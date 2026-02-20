@@ -24,7 +24,17 @@ To assess this, we depart from SciCode in one key way: in addition to test-case 
 
 ### Problem Structure
 
-Each problem is a multi-step disease modeling task stored as JSONL. Problems are organized hierarchically:
+Each problem is a multi-step disease modeling task. The **source of truth** is a set of human-readable Markdown files (`problems/starsim_t*.md`). These are converted to JSONL (`problems/starsim_t*.jsonl`) for consumption by the evaluation harness.
+
+**Editing problems:** Edit the `.md` files, then regenerate the JSONL:
+
+```bash
+python3 problems/build_jsonl.py
+```
+
+A test (`test_jsonl_matches_markdown`) ensures the JSONL files stay in sync with the Markdown sources — if you edit a `.md` file without regenerating, `uv run pytest tests/test_problems.py` will fail.
+
+Problems are organized hierarchically:
 
 **Main Problem** — A complete modeling task (e.g., "Build an SIR model with age-stratified mixing and calibrate to observed data").
 
