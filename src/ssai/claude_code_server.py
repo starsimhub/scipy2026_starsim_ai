@@ -9,6 +9,7 @@ Run:
 from __future__ import annotations
 
 import logging
+import os
 import click
 import uvicorn
 
@@ -138,6 +139,12 @@ def build_agent_card(host: str, port: int) -> AgentCard:
     multiple=True,
     help="MCP server name to enable (repeatable, e.g. --mcp secret)",
 )
+@click.option(
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Print detailed Claude execution progress to stdout",
+)
 def main(
     host: str,
     port: int,
@@ -145,14 +152,18 @@ def main(
     model: str | None,
     max_turns: int | None,
     mcp_servers: tuple[str, ...],
+    verbose: bool,
 ):
     """Start the Claude Code A2A server."""
+
+    model = model or os.environ.get("CLAUDE_MODEL") or None
 
     config = ClaudeCodeConfig(
         workspace_root=workspace,
         model=model,
         max_turns=max_turns,
         mcp_servers=list(mcp_servers) if mcp_servers else None,
+        verbose=verbose,
     )
 
     executor = ClaudeCodeExecutor(config=config)
