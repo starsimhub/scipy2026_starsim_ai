@@ -8,9 +8,8 @@ The agent can iteratively write, test, and refine code — unlike the LLM
 eval which only gets a single generation attempt.
 
 Prerequisites:
-    Start the Claude Code A2A server before running:
-        python -m ssai.claude_code_server --port 9100
-
+    Start the Claude Code A2A server before running using the Docker Compose file:
+        ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY docker compose up --build
 Usage:
     inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
 
@@ -19,9 +18,10 @@ Options:
     -T problems_dir=<path>       Path to problems JSONL directory (default: ./problems)
     -T tutorial=<id>             Run only a specific tutorial, e.g. "starsim_t1"
     -T with_background=True      Include background context in prompts (default: True)
+    -T with_test_cases=True      Include test cases in prompts (default: True)
     -T timeout=60                Timeout in seconds for test execution (default: 60)
     -T request_timeout=600       HTTP timeout for agent requests (default: 600)
-    -T max_retries=1             Max retries on HTTP timeout (default: 3)
+    -T max_retries=1             Max retries on HTTP timeout (default: 1)
 """
 
 from dotenv import load_dotenv
@@ -79,10 +79,6 @@ AGENT_PROMPT_TEMPLATE = textwrap.dedent("""\
     {function_header}
         \"\"\"{docstring}\"\"\"
     ```
-
-    ## Test Cases
-    The following test cases will be used to verify your solution.
-    You can use these to test your implementation:
 
     {test_cases_section}
 
@@ -147,8 +143,9 @@ def _extract_a2a_response(data: dict) -> str:
 def a2a_agent_solver(
     agent_url: str = "http://localhost:9100",
     with_background: bool = True,
+    with_test_cases: bool = True,
     request_timeout: int = 600,
-    max_retries: int = 3,
+    max_retries: int = 1,
 ):
     """Solver that sends problems to a Claude Code A2A server."""
 
@@ -158,7 +155,13 @@ def a2a_agent_solver(
         background_section = (
             f"## Background\n{meta['background']}" if with_background else ""
         )
-        test_cases_section = _format_test_cases(meta["test_cases"])
+        test_cases_section = (
+            "## Test Cases\nThe following test cases will be used to verify your solution.\n"
+            "You can use these to test your implementation:\n\n"
+            + _format_test_cases(meta["test_cases"])
+            if with_test_cases
+            else ""
+        )
 
         prompt = AGENT_PROMPT_TEMPLATE.format(
             dependencies=deps,
@@ -297,9 +300,10 @@ def starsim_agent_benchmark(
     problems_dir: str = str(Path(__file__).resolve().parent.parent.parent / "problems"),
     tutorial: str | None = None,
     with_background: bool = True,
+    with_test_cases: bool = True,
     timeout: int = 60,
     request_timeout: int = 600,
-    max_retries: int = 3,
+    max_retries: int = 1,
 ) -> Task:
     """Starsim agent coding evaluation benchmark.
 
@@ -311,9 +315,10 @@ def starsim_agent_benchmark(
         problems_dir: Path to directory containing problem JSONL files.
         tutorial: Optional tutorial ID to filter (e.g. "starsim_t1").
         with_background: Whether to include background context in prompts.
+        with_test_cases: Whether to include test cases in prompts.
         timeout: Timeout in seconds for each test case execution.
         request_timeout: HTTP timeout in seconds for agent requests.
-        max_retries: Max retries on HTTP timeout (default: 3).
+        max_retries: Max retries on HTTP timeout (default: 1).
     """
     samples = load_problems(problems_dir, tutorial)
     dataset = MemoryDataset(samples=samples, name="starsim_agent")
@@ -323,6 +328,7 @@ def starsim_agent_benchmark(
         solver=a2a_agent_solver(
             agent_url=agent_url,
             with_background=with_background,
+            with_test_cases=with_test_cases,
             request_timeout=request_timeout,
             max_retries=max_retries,
         ),

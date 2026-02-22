@@ -17,6 +17,8 @@ import json
 import logging
 import os
 import tempfile
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -113,6 +115,42 @@ def new_agent_text_message(text: str, final: bool = True) -> Message:
 
 
 # ---------------------------------------------------------------------------
+# Execution logger  (structured JSONL logs for later analysis)
+# ---------------------------------------------------------------------------
+
+class ExecutionLogger:
+    """Writes structured JSONL logs for each task execution.
+
+    Logs are organized by server run:
+    ``<log_dir>/<run_id>/<task_id>.jsonl``.
+
+    Each server start creates a new run directory (ISO-8601 timestamp by
+    default), so consecutive eval runs are cleanly separated.  A custom
+    *run_id* can be passed to label runs explicitly.
+
+    Every line is a self-contained JSON object with at least
+    ``{"ts": ..., "run_id": ..., "event": ...}``.
+    """
+
+    def __init__(self, log_dir: Path, run_id: str | None = None):
+        self.run_id = run_id or datetime.now(timezone.utc).strftime(
+            "%Y%m%dT%H%M%SZ"
+        )
+        self.run_dir = log_dir / self.run_id
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+
+    def _path_for(self, task_id: str) -> Path:
+        safe_id = task_id.replace("/", "_").replace("..", "_")
+        return self.run_dir / f"{safe_id}.jsonl"
+
+    def log(self, task_id: str, event: str, **data: Any) -> None:
+        record = {"ts": time.time(), "run_id": self.run_id,
+                  "event": event, **data}
+        with open(self._path_for(task_id), "a") as f:
+            f.write(json.dumps(record, default=str) + "\n")
+
+
+# ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
@@ -131,6 +169,10 @@ class ClaudeCodeConfig:
         model:           Model to use (None = SDK default).
         max_turns:       Max agent loop iterations per request.
         verbose:         Print detailed execution progress to stdout.
+        log_dir:         Directory for structured JSONL execution logs.
+                         One file per task. None = logging disabled.
+        run_id:          Label for this server run (used as subdirectory
+                         under log_dir). Defaults to an ISO-8601 timestamp.
     """
 
     def __init__(
@@ -143,6 +185,8 @@ class ClaudeCodeConfig:
         max_turns: int | None = None,
         mcp_servers: list[str] | None = None,
         verbose: bool = False,
+        log_dir: str | Path | None = None,
+        run_id: str | None = None,
     ):
         self.workspace_root = Path(
             workspace_root or tempfile.mkdtemp(prefix="claude_a2a_")
@@ -163,6 +207,8 @@ class ClaudeCodeConfig:
         self.max_turns = max_turns
         self.mcp_servers = mcp_servers or []
         self.verbose = verbose
+        self.log_dir = Path(log_dir) if log_dir else None
+        self.run_id = run_id
 
         # Set module-level flag so _log_to_console can check it
         global _verbose_enabled
@@ -212,6 +258,10 @@ class ClaudeCodeExecutor(AgentExecutor):
         self.config = config or ClaudeCodeConfig()
         self.sessions = SessionTracker()
         self._cancel_events: dict[str, asyncio.Event] = {}
+        self._exec_logger: ExecutionLogger | None = (
+            ExecutionLogger(self.config.log_dir, self.config.run_id)
+            if self.config.log_dir else None
+        )
 
     # ----- workspace management -----
 
@@ -285,6 +335,12 @@ class ClaudeCodeExecutor(AgentExecutor):
         if task_id:
             self._cancel_events[task_id] = cancel_event
 
+        # Structured execution log
+        elog = self._exec_logger
+        if elog and task_id:
+            elog.log(task_id, "task_start", prompt=user_text,
+                     workspace=str(workspace), model=self.config.model)
+
         logger.info(
             "Claude Code executing | task=%s workspace=%s prompt_len=%d",
             task_id, workspace, len(user_text),
@@ -335,6 +391,9 @@ class ClaudeCodeExecutor(AgentExecutor):
                         if isinstance(block, TextBlock) and block.text:
                             collected_text.append(block.text)
                             _log_to_console("ASSISTANT", block.text, task_id)
+                            if elog and task_id:
+                                elog.log(task_id, "assistant_text",
+                                         text=block.text)
 
                             # Emit intermediate streaming update
                             await event_queue.enqueue_event(
@@ -364,6 +423,10 @@ class ClaudeCodeExecutor(AgentExecutor):
                                 f"{block.name}({input_summary})",
                                 task_id,
                             )
+                            if elog and task_id:
+                                elog.log(task_id, "tool_use",
+                                         tool=block.name,
+                                         input=input_summary)
 
                             # Notify the caller which tool Claude is using
                             tool_msg = f"🔧 Using tool: {block.name}"
@@ -385,12 +448,17 @@ class ClaudeCodeExecutor(AgentExecutor):
                     # Capture the session ID for multi-turn
                     session_id = getattr(msg, "session_id", None)
                     _log_to_console("RESULT", f"session_id={session_id}", task_id)
+                    if elog and task_id:
+                        elog.log(task_id, "result",
+                                 session_id=session_id)
 
                 else:
                     _log_to_console("MSG", f"{type(msg).__name__}", task_id)
 
         except Exception as exc:
             logger.exception("Claude Code execution failed for task %s", task_id)
+            if elog and task_id:
+                elog.log(task_id, "error", error=str(exc))
             if self.config.verbose:
                 print(f"  ERROR | task={task_id}: {exc}", flush=True)
             await event_queue.enqueue_event(
@@ -415,8 +483,13 @@ class ClaudeCodeExecutor(AgentExecutor):
         if task_id and session_id:
             self.sessions.set(task_id, session_id)
 
-        # Emit the final result as an artifact
+        # Log completion
         final_text = "\n".join(collected_text) if collected_text else "Done."
+        if elog and task_id:
+            elog.log(task_id, "task_complete",
+                     response_len=len(final_text))
+
+        # Emit the final result as an artifact
         await event_queue.enqueue_event(
             TaskArtifactUpdateEvent(
                 taskId=task_id or "",

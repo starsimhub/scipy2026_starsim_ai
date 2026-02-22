@@ -10,6 +10,7 @@ Options:
     -T problems_dir=<path>       Path to problems JSONL directory (default: ./problems)
     -T tutorial=<id>             Run only a specific tutorial, e.g. "starsim_t1"
     -T with_background=True      Include background context in prompts (default: True)
+    -T with_test_cases=False     Include test cases in prompts (default: False)
     -T timeout=60                Timeout in seconds for test execution (default: 60)
 """
 
@@ -61,18 +62,34 @@ PROMPT_TEMPLATE = textwrap.dedent("""\
         \"\"\"{docstring}\"\"\"
     ```
 
+    {test_cases_section}
+
     Return ONLY the function implementation inside a single ```python``` code block.
     Include any necessary import statements inside the function body.
 """)
 
 
+def _format_test_cases(test_cases: list[dict]) -> str:
+    """Format test cases for inclusion in the prompt."""
+    parts = []
+    for tc in test_cases:
+        parts.append(f"### {tc['description']}\n```python\n{tc['test']}\n```")
+    return "\n\n".join(parts)
+
+
 @solver
-def starsim_solver(with_background: bool = True):
+def starsim_solver(with_background: bool = True, with_test_cases: bool = False):
     async def solve(state: TaskState, generate: Generate) -> TaskState:
         meta = state.metadata
         deps = ", ".join(meta["dependencies"])
         background_section = (
             f"## Background\n{meta['background']}" if with_background else ""
+        )
+        test_cases_section = (
+            "## Test Cases\nThe following test cases will be used to verify your solution:\n\n"
+            + _format_test_cases(meta["test_cases"])
+            if with_test_cases
+            else ""
         )
         prompt = PROMPT_TEMPLATE.format(
             dependencies=deps,
@@ -80,6 +97,7 @@ def starsim_solver(with_background: bool = True):
             background_section=background_section,
             function_header=meta["function_header"],
             docstring=meta["docstring"],
+            test_cases_section=test_cases_section,
         )
         state.user_prompt.text = prompt
         return await generate(state)
@@ -118,6 +136,7 @@ def starsim_benchmark(
     problems_dir: str = str(Path(__file__).resolve().parent.parent.parent / "problems"),
     tutorial: str | None = None,
     with_background: bool = True,
+    with_test_cases: bool = False,
     timeout: int = 60,
 ) -> Task:
     """Starsim coding evaluation benchmark.
@@ -126,6 +145,7 @@ def starsim_benchmark(
         problems_dir: Path to directory containing problem JSONL files.
         tutorial: Optional tutorial ID to filter (e.g. "starsim_t1").
         with_background: Whether to include background context in prompts.
+        with_test_cases: Whether to include test cases in prompts.
         timeout: Timeout in seconds for each test case execution.
     """
     samples = load_problems(problems_dir, tutorial)
@@ -133,6 +153,6 @@ def starsim_benchmark(
 
     return Task(
         dataset=dataset,
-        solver=starsim_solver(with_background=with_background),
+        solver=starsim_solver(with_background=with_background, with_test_cases=with_test_cases),
         scorer=starsim_scorer(timeout=timeout),
     )

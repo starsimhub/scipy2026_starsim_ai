@@ -16,4 +16,12 @@ if [ "$VERBOSE" = "true" ] || [ "$VERBOSE" = "1" ]; then
     args+=("--verbose")
 fi
 
+if [ -n "$LOG_DIR" ]; then
+    args+=("--log-dir" "$LOG_DIR")
+fi
+
+if [ -n "$RUN_ID" ]; then
+    args+=("--run-id" "$RUN_ID")
+fi
+
 exec start-claude-code-server "${args[@]}"

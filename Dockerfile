@@ -35,6 +35,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Create non-root user (claude CLI refuses bypassPermissions as root)
 RUN useradd -m -s /bin/bash agent
 RUN chown agent:agent /app -R
+RUN mkdir -p /home/agent/agent_logs && chown agent:agent /home/agent/agent_logs
 
 USER agent
 
