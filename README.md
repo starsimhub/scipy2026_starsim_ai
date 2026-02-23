@@ -25,7 +25,7 @@ Only the Anthropic API key is strictly required, but the OpenAI key is also requ
 
 ### 2. Start the A2A server
 
-Uses Docker:
+#### Using Docker (recommended)
 
 ```bash
 docker compose up --build
@@ -53,72 +53,7 @@ Docker environment variables:
 | `LOG_DIR` | `/home/agent/agent_logs` | Directory for structured execution logs |
 | `RUN_ID` | ISO-8601 timestamp | Label for this server run (subdirectory under `LOG_DIR`) |
 
-### 2. Run the evaluation
-
-The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure performance on the Starsim problem set. See [`eval/llm/README.md`](eval/llm/README.md) for the full list of options.
-
-#### Agent evaluation (iterative)
-
-Tests an agent's ability to iteratively write, test, and debug Starsim code. Problems are sent to the Claude Code A2A server, which can execute code, observe errors, and refine its solution. The agent receives test cases in the prompt so it can self-test.
-
-```bash
-# Install dependencies (for running the eval client locally)
-uv sync
-
-# Activate environment; else use "uv run" before commands
-source .venv/bin/activate
-
-# Run the agent eval -- main use case, takes about 10 minutes
-inspect eval eval/agent/starsim.py
-
-# Run a single tutorial -- for testing
-inspect eval eval/agent/starsim.py -T tutorial=starsim_t1
-
-# Customize timeouts and retries
-inspect eval eval/agent/starsim.py -T request_timeout=300 -T max_retries=5
-```
-
-Agent evaluation parameters:
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `agent_url` | `http://localhost:9100` | URL of the A2A server |
-| `problems_dir` | `./problems` | Path to problem JSONL directory |
-| `tutorial` | all | Run only a specific tutorial (e.g. `starsim_t1`) |
-| `with_background` | `True` | Include background context in prompts |
-| `timeout` | `60` | Timeout in seconds for each test case execution |
-| `request_timeout` | `600` | HTTP timeout in seconds for agent requests |
-| `max_retries` | `1` | Max retries on HTTP timeout |
-
-#### LLM evaluation (one-shot)
-
-Tests a model's ability to generate correct Starsim code in a single attempt (no A2A server needed):
-
-```bash
-# Run the full benchmark
-inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
-
-# Run a single tutorial
-inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0 -T tutorial=starsim_t1
-
-# Run without background context
-inspect eval eval/llm/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
-```
-
-### 3. Browse the evaluation dataset
-
-A Streamlit app (`app.py`) lets you browse the evaluation problems interactively.
-
-```bash
-uv run streamlit run app.py
-```
-
-Features:
-- Select a main problem (Tutorial 1, 2, or 3) from the sidebar
-- Browse individual sub-steps with full descriptions, background context, function signatures, docstrings, and test cases
-- Toggle **Show gold solution** to reveal the reference implementation
-
-### Alternative: Running the A2A server locally
+#### Alternative: Running the A2A server locally
 
 **Not appropriate for evaluation**: The agent is able to access local files (including the problems and answers!). This
 option is used for development. If you want to run evaluations use the Dockerized A2A server.
@@ -147,11 +82,91 @@ Server CLI options:
 | `--log-dir` | — | Directory for structured JSONL execution logs (one file per task) |
 | `--run-id` | ISO-8601 timestamp | Label for this server run (subdirectory under `--log-dir`) |
 
+### 3. Run the evaluation
+
+The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure performance on the Starsim problem set. See [`eval/llm/README.md`](eval/llm/README.md) for the full list of options.
+
+#### Agent evaluation (iterative)
+
+Tests an agent's ability to iteratively write, test, and debug Starsim code. Problems are sent to the Claude Code A2A server, which can execute code, observe errors, and refine its solution. The agent receives test cases in the prompt so it can self-test.
+
+```bash
+# Install dependencies (for running the eval client locally)
+uv sync
+
+# Activate environment; else use "uv run" before commands
+source .venv/bin/activate
+
+# Run the agent eval -- main use case, takes about 10 minutes
+inspect eval eval/agent/starsim.py
+
+# Run a single tutorial -- for testing
+inspect eval eval/agent/starsim.py -T tutorial=starsim_t1
+
+# Customize timeouts and retries
+inspect eval eval/agent/starsim.py -T request_timeout=300 -T max_retries=5
+
+# Run evaluation for all models, takes about 40 minutes
+./eval/agent/run.sh
+```
+
+Agent evaluation parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `agent_url` | `http://localhost:9100` | URL of the A2A server |
+| `problems_dir` | `./problems` | Path to problem JSONL directory |
+| `tutorial` | all | Run only a specific tutorial (e.g. `starsim_t1`) |
+| `with_background` | `True` | Include background context in prompts |
+| `timeout` | `60` | Timeout in seconds for each test case execution |
+| `request_timeout` | `600` | HTTP timeout in seconds for agent requests |
+| `max_retries` | `1` | Max retries on HTTP timeout |
+
+#### LLM evaluation (one-shot)
+
+Tests a model's ability to generate correct Starsim code in a single attempt (no A2A server needed):
+
+```bash
+# Run the full benchmark
+inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
+
+# Run a single tutorial
+inspect eval eval/llm/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0 -T tutorial=starsim_t1
+
+# Run without background context
+inspect eval eval/llm/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
+
+# Run all models, takes about 10 min
+./eval/llm/run.sh
+```
+
+### 4. Analyze the results
+
+Evaluation is based on the `inspect` module, so must be run in the same environment; running interactively allows the plots to be viewed:
+
+```bash
+uv run python -i analysis/eval_performance.py
+```
+
+
 ## Evaluation Dataset
 
 Our evaluation benchmark follows the structure of [SciCode](https://arxiv.org/abs/2407.13168), adapted for disease modeling with [Starsim](https://github.com/starsimhub/starsim). A central goal of this benchmark is to measure how well an agent can **leverage Starsim as a library** to solve modeling problems, rather than writing disease models from scratch. Agents that effectively use Starsim's built-in components (e.g., `ss.SIR`, `ss.Vaccine`, contact networks) demonstrate the kind of library fluency that matters in practice. Furthermore, we add a time limit on the agent evaluation to assess the time required to find a solution (or not!).
 
 To assess this, we depart from SciCode in one key way: in addition to test-case validation, we use an **LLM-judge assessment** to evaluate whether the agent's solution actually uses Starsim APIs. This catches cases where an agent produces numerically correct output but bypasses Starsim entirely (e.g., by implementing ODE solvers from scratch). The judge reviews the generated code and scores it on Starsim API usage, idiomatic patterns, and appropriate use of library abstractions.
+
+### Browse the evaluation dataset
+
+A Streamlit app (`app.py`) lets you browse the evaluation problems interactively.
+
+```bash
+uv run streamlit run app.py
+```
+
+Features:
+- Select a main problem (Tutorial 1, 2, or 3) from the sidebar
+- Browse individual sub-steps with full descriptions, background context, function signatures, docstrings, and test cases
+- Toggle **Show gold solution** to reveal the reference implementation
 
 ### Problem Structure
 
