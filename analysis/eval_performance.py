@@ -46,3 +46,5 @@ ax.set_ylim(0, 1)
 ax.set_xlabel('Model')
 ax.set_ylabel('Pass rate')
 ax.set_title('Starsim LLM Benchmark')
+
+plt.show()
