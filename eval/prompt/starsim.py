@@ -4,7 +4,13 @@ Evaluates LLM ability to write Starsim simulation code by presenting
 function specifications and scoring generated code against test cases.
 
 Usage:
-    inspect eval eval/prompt/starsim.py --model <your_model> --temperature 0
+    inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0
+
+Model shorthands (used in run.sh / debug_run.sh):
+    sonnet      → anthropic/claude-sonnet-4-6
+    opus        → anthropic/claude-opus-4-6
+    gpt-5-mini  → openai/gpt-5-mini-2025-08-07
+    gpt-5.2     → openai/gpt-5.2-2025-12-11
 
 Options:
     -T problems_dir=<path>       Path to problems JSONL directory (default: ./problems)

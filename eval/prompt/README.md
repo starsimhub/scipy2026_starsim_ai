@@ -20,13 +20,24 @@ uv sync
 Tests a model's ability to generate Starsim code in a single attempt. The model receives a problem description and function signature, and must return a complete implementation.
 
 ```bash
-inspect eval eval/prompt/starsim.py --model <your_model> --temperature 0
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0
 ```
+
+Model shorthands (used in `run.sh`):
+
+| Shorthand | `--model` value |
+|-----------|-----------------|
+| `sonnet` | `anthropic/claude-sonnet-4-6` |
+| `opus` | `anthropic/claude-opus-4-6` |
+| `gpt-5-mini` | `openai/gpt-5-mini-2025-08-07` |
+| `gpt-5.2` | `openai/gpt-5.2-2025-12-11` |
 
 #### Options
 
 | Flag | Description | Default |
 |------|-------------|---------|
+| `--model <model_id>` | Full model ID (see table above) | — |
+| `--temperature <float>` | Sampling temperature | model default |
 | `-T problems_dir=<path>` | Path to problems JSONL directory | `./problems` |
 | `-T tutorial=<id>` | Run only a specific tutorial (e.g., `starsim_t1`) | all |
 | `-T with_background=True/False` | Include background context in prompts | `True` |
@@ -39,7 +50,7 @@ Run a single tutorial:
 
 ```bash
 inspect eval eval/prompt/starsim.py \
-    --model openai/gpt-4o \
+    --model anthropic/claude-sonnet-4-6 \
     --temperature 0 \
     -T tutorial=starsim_t1
 ```
@@ -48,7 +59,7 @@ Run without background context:
 
 ```bash
 inspect eval eval/prompt/starsim.py \
-    --model anthropic/claude-sonnet-4-20250514 \
+    --model anthropic/claude-sonnet-4-6 \
     --temperature 0 \
     -T with_background=False
 ```

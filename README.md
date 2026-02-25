@@ -164,14 +164,14 @@ Agent evaluation parameters:
 Tests a model's ability to generate correct Starsim code in a single attempt (no A2A server needed):
 
 ```bash
-# Run the full benchmark
-inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
+# Run the full benchmark (sonnet)
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0
 
 # Run a single tutorial
-inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0 -T tutorial=starsim_t1
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0 -T tutorial=starsim_t1
 
 # Run without background context
-inspect eval eval/prompt/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
+inspect eval eval/prompt/starsim.py --model openai/gpt-5-mini-2025-08-07 -T with_background=False
 
 # Run all models, takes about 10 min
 ./eval/prompt/run.sh

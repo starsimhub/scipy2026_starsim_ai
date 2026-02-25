@@ -23,7 +23,7 @@ python3 problems/build_jsonl.py
 start-claude-code-server --port 9100 --workspace ./workspaces
 
 # Run prompt evaluation
-inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0
 
 # Run agent evaluation
 inspect eval eval/agent/starsim.py -T model=sonnet
