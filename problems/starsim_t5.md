@@ -13,7 +13,7 @@ Starsim supports several ways to specify contact networks. The most explicit is 
 
 ### Function Header
 ```python
-def create_random_net_sim(n_agents: int = 5_000, n_contacts: int = 10, beta: float = 0.05, init_prev: float = 0.01) -> dict:
+def create_random_net_sim(n_agents=5_000, n_contacts=10, beta=0.05, init_prev=0.01):
 ```
 
 ### Docstring
@@ -61,7 +61,7 @@ assert result['sim'].results.sir.cum_infections[-1] > 0, 'There should be at lea
 
 ### Gold Solution
 ```python
-def create_random_net_sim(n_agents: int = 5_000, n_contacts: int = 10, beta: float = 0.05, init_prev: float = 0.01) -> dict:
+def create_random_net_sim(n_agents=5_000, n_contacts=10, beta=0.05, init_prev=0.01):
     import starsim as ss
     net = ss.RandomNet(n_contacts=n_contacts)
     sir = ss.SIR(beta=beta, init_prev=init_prev)
@@ -89,7 +89,7 @@ In network epidemiology, the average number of contacts (node degree) is a key d
 
 ### Function Header
 ```python
-def compare_network_density(n_contacts_list: list[int], n_agents: int = 5_000, beta: float = 0.05, init_prev: float = 0.01) -> dict[int, dict]:
+def compare_network_density(n_contacts_list, n_agents=5_000, beta=0.05, init_prev=0.01):
 ```
 
 ### Docstring
@@ -137,7 +137,7 @@ assert 0 < results[10]['peak_prevalence'] <= 1.0, 'Peak prevalence should be a v
 
 ### Gold Solution
 ```python
-def compare_network_density(n_contacts_list: list[int], n_agents: int = 5_000, beta: float = 0.05, init_prev: float = 0.01) -> dict[int, dict]:
+def compare_network_density(n_contacts_list, n_agents=5_000, beta=0.05, init_prev=0.01):
     import starsim as ss
     import numpy as np
     results = {}
@@ -165,7 +165,7 @@ Starsim provides specialized network types for modeling sexually transmitted inf
 
 ### Function Header
 ```python
-def create_mfnet_sim(n_agents: int = 2_000, beta: float = 0.5, init_prev: float = 0.1, dur: int = 20) -> ss.Sim:
+def create_mfnet_sim(n_agents=2_000, beta=0.5, init_prev=0.1, dur=20):
 ```
 
 ### Docstring
@@ -212,7 +212,7 @@ assert len(df) > 0, 'MFNet should have active partnerships'
 
 ### Gold Solution
 ```python
-def create_mfnet_sim(n_agents: int = 2_000, beta: float = 0.5, init_prev: float = 0.1, dur: int = 20) -> ss.Sim:
+def create_mfnet_sim(n_agents=2_000, beta=0.5, init_prev=0.1, dur=20):
     import starsim as ss
     mf = ss.MFNet()
     sis = ss.SIS(beta=beta, init_prev=init_prev)
@@ -234,7 +234,7 @@ Starsim provides two fundamentally different approaches for modeling contacts. s
 
 ### Function Header
 ```python
-def compare_network_types(n_agents: int = 5_000, n_contacts: int = 4, init_prev: float = 0.01) -> dict[str, dict]:
+def compare_network_types(n_agents=5_000, n_contacts=4, init_prev=0.01):
 ```
 
 ### Docstring
@@ -285,13 +285,13 @@ for key in ['mixing_pool', 'random_net']:
 
 ### Gold Solution
 ```python
-def compare_network_types(n_agents: int = 5_000, n_contacts: int = 4, init_prev: float = 0.01) -> dict[str, dict]:
+def compare_network_types(n_agents=5_000, n_contacts=4, init_prev=0.01):
     import starsim as ss
     import numpy as np
 
     # Mixing pool approach
-    mp = ss.MixingPool(n_contacts=ss.poisson(lam=n_contacts))
-    sir_mp = ss.SIR(init_prev=init_prev)
+    mp = ss.MixingPool(beta=1.0, n_contacts=ss.poisson(lam=n_contacts))
+    sir_mp = ss.SIR(beta=0.05, init_prev=init_prev)
     sim_mp = ss.Sim(n_agents=n_agents, diseases=sir_mp, networks=mp)
     sim_mp.run()
 

@@ -13,7 +13,7 @@ Starsim supports two ways of configuring simulations. The dictionary approach bu
 
 ### Function Header
 ```python
-def create_component_sim(n_agents: int = 5_000, n_contacts: int = 4, init_prev: float = 0.1, beta: float = 0.1) -> ss.Sim:
+def create_component_sim(n_agents=5_000, n_contacts=4, init_prev=0.1, beta=0.1):
 ```
 
 ### Docstring
@@ -71,7 +71,7 @@ assert sim.pars.n_agents == 1_000, 'Population size should match the n_agents pa
 
 ### Gold Solution
 ```python
-def create_component_sim(n_agents: int = 5_000, n_contacts: int = 4, init_prev: float = 0.1, beta: float = 0.1) -> ss.Sim:
+def create_component_sim(n_agents=5_000, n_contacts=4, init_prev=0.1, beta=0.1):
     import starsim as ss
     people = ss.People(n_agents=n_agents)
     network = ss.RandomNet(n_contacts=n_contacts)
@@ -93,7 +93,7 @@ In real populations, the number of contacts varies across individuals. Some peop
 
 ### Function Header
 ```python
-def create_heterogeneous_sim(n_agents: int = 5_000, mean_contacts: int = 4, init_prev: float = 0.1, beta: float = 0.1) -> ss.Sim:
+def create_heterogeneous_sim(n_agents=5_000, mean_contacts=4, init_prev=0.1, beta=0.1):
 ```
 
 ### Docstring
@@ -140,7 +140,7 @@ assert sim.pars.n_agents == 1_000, 'Population size should match n_agents'
 
 ### Gold Solution
 ```python
-def create_heterogeneous_sim(n_agents: int = 5_000, mean_contacts: int = 4, init_prev: float = 0.1, beta: float = 0.1) -> ss.Sim:
+def create_heterogeneous_sim(n_agents=5_000, mean_contacts=4, init_prev=0.1, beta=0.1):
     import starsim as ss
     people = ss.People(n_agents=n_agents)
     network = ss.RandomNet(n_contacts=ss.poisson(mean_contacts))
@@ -162,7 +162,7 @@ When modeling outbreaks at daily resolution, parameter units must match the time
 
 ### Function Header
 ```python
-def refugee_camp_outbreak(n_agents: int = 2_000, n_contacts: int = 4, init_prev: float = 0.001, beta: float = 0.02, dur_inf: int = 14) -> float:
+def refugee_camp_outbreak(n_agents=2_000, n_contacts=4, init_prev=0.001, beta=0.02, dur_inf=14):
 ```
 
 ### Docstring
@@ -215,12 +215,12 @@ assert high > low, 'Higher beta should produce more infections'
 
 ### Gold Solution
 ```python
-def refugee_camp_outbreak(n_agents: int = 2_000, n_contacts: int = 4, init_prev: float = 0.001, beta: float = 0.02, dur_inf: int = 14) -> float:
+def refugee_camp_outbreak(n_agents=2_000, n_contacts=4, init_prev=0.001, beta=0.02, dur_inf=14):
     import starsim as ss
     people = ss.People(n_agents=n_agents)
     network = ss.RandomNet(n_contacts=n_contacts)
     sir = ss.SIR(dur_inf=ss.days(dur_inf), beta=ss.perday(beta), init_prev=init_prev)
-    sim = ss.Sim(people=people, diseases=sir, networks=network, start='2025-01-01', dur=365, dt='day')
+    sim = ss.Sim(people=people, diseases=sir, networks=network, start='2025-01-01', stop='2026-01-01', dt=ss.day)
     sim.run()
     return float(sim.results.sir.cum_infections[-1])
 ```
@@ -237,7 +237,7 @@ The basic reproduction number R0 — the average number of secondary infections 
 
 ### Function Header
 ```python
-def explore_epidemic_drivers(betas: list[float] = [0.01, 0.05, 0.10], n_contacts_list: list[int] = [2, 4, 8], dur_infs: list[int] = [5, 10, 20], n_agents: int = 5_000) -> dict[str, dict]:
+def explore_epidemic_drivers(betas=None, n_contacts_list=None, dur_infs=None, n_agents=5_000):
 ```
 
 ### Docstring
@@ -308,8 +308,11 @@ for sweep_name, sweep in results.items():
 
 ### Gold Solution
 ```python
-def explore_epidemic_drivers(betas: list[float] = [0.01, 0.05, 0.10], n_contacts_list: list[int] = [2, 4, 8], dur_infs: list[int] = [5, 10, 20], n_agents: int = 5_000) -> dict[str, dict]:
+def explore_epidemic_drivers(betas=None, n_contacts_list=None, dur_infs=None, n_agents=5_000):
     import starsim as ss
+    if betas is None: betas = [0.01, 0.05, 0.10]
+    if n_contacts_list is None: n_contacts_list = [2, 4, 8]
+    if dur_infs is None: dur_infs = [5, 10, 20]
     results = {'beta': {}, 'n_contacts': {}, 'dur_inf': {}}
     # Sweep beta
     for beta in betas:

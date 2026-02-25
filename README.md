@@ -129,28 +129,32 @@ Tests an agent's ability to iteratively write, test, and debug Starsim code. Pro
 # Install dependencies (for running the eval client locally)
 uv sync
 
-# Run the agent eval against the base agent (port 9100)
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+# Run the agent eval with sonnet (no plugin → port 9100)
+inspect eval eval/agent/starsim.py -T model=sonnet
 
-# Run the agent eval against the Starsim-AI-enabled agent (port 9101)
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9101
+# Run the agent eval with sonnet + plugin (→ port 9101)
+inspect eval eval/agent/starsim.py -T model=sonnet -T with_plugin=True
+
+# Run with opus (no plugin → port 9102)
+inspect eval eval/agent/starsim.py -T model=opus
 
 # Run a single tutorial
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100 -T tutorial=starsim_t1
+inspect eval eval/agent/starsim.py -T model=sonnet -T tutorial=starsim_t1
 
 # Customize timeouts and retries
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100 -T request_timeout=300 -T max_retries=5
+inspect eval eval/agent/starsim.py -T model=sonnet -T request_timeout=300 -T max_retries=5
 ```
 
 Agent evaluation parameters:
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `agent_url` | `http://localhost:9100` | URL of the A2A server |
+| `model` | `sonnet` | Agent model: `sonnet` or `opus` (determines A2A server port) |
 | `problems_dir` | `./problems` | Path to problem JSONL directory |
 | `tutorial` | all | Run only a specific tutorial (e.g. `starsim_t1`) |
 | `with_background` | `True` | Include background context in prompts |
 | `with_test_cases` | `True` | Include test cases in prompts |
+| `with_plugin` | `False` | Use the plugin-enabled server variant |
 | `timeout` | `60` | Timeout in seconds for each test case execution |
 | `request_timeout` | `600` | HTTP timeout in seconds for agent requests |
 | `max_retries` | `1` | Max retries on HTTP timeout |
@@ -160,14 +164,14 @@ Agent evaluation parameters:
 Tests a model's ability to generate correct Starsim code in a single attempt (no A2A server needed):
 
 ```bash
-# Run the full benchmark
-inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0
+# Run the full benchmark (sonnet)
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0
 
 # Run a single tutorial
-inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-20250514 --temperature 0 -T tutorial=starsim_t1
+inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temperature 0 -T tutorial=starsim_t1
 
 # Run without background context
-inspect eval eval/prompt/starsim.py --model openai/gpt-4o --temperature 0 -T with_background=False
+inspect eval eval/prompt/starsim.py --model openai/gpt-5-mini-2025-08-07 -T with_background=False
 
 # Run all models, takes about 10 min
 ./eval/prompt/run.sh

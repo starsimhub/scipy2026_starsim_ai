@@ -14,8 +14,9 @@ df_eval.head()
 print(df_eval.columns)
 print(f"df_eval.shape: {df_eval.shape}")
 
-task_name = 'starsim_agent_benchmark'
-df_task = df_eval[df_eval['task_name'] == task_name]
+# task_name = 'starsim_agent_benchmark'
+# df_task = df_eval[df_eval['task_name'] == task_name]
+df_task = df_eval # TODO: fix
 df_task = df_task.sort_values(by='model')
 
 sc.options(dpi=150)

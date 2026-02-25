@@ -1,38 +1,64 @@
-services:
-  agent:
-    build: .
-    ports:
-      - "${PORT:-9100}:${PORT:-9100}"
-    environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - CLAUDE_MODEL=${CLAUDE_MODEL:-}
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${PORT:-9100}
-      - MAX_TURNS=${MAX_TURNS:-}
-      - VERBOSE=${VERBOSE:-}
-      - LOG_DIR=${LOG_DIR:-/home/agent/agent_logs}
-      - RUN_ID=${RUN_ID:-}
-    volumes:
-      - agent-logs:/home/agent/agent_logs
+x-common: &common
+  build: .
+  environment: &common-env
+    ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    HOST: ${HOST:-0.0.0.0}
+    MAX_TURNS: ${MAX_TURNS:-}
+    VERBOSE: ${VERBOSE:-}
+    LOG_DIR: ${LOG_DIR:-/home/agent/agent_logs}
+    RUN_ID: ${RUN_ID:-}
 
-  agent-starsim:
-    build: .
-    ports:
-      - "${STARSIM_PORT:-9101}:${STARSIM_PORT:-9101}"
+services:
+  # Port 9100: Sonnet, no plugin
+  sonnet:
+    <<: *common
+    ports: ["9100:9100"]
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - CLAUDE_MODEL=${CLAUDE_MODEL:-}
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${STARSIM_PORT:-9101}
-      - MAX_TURNS=${MAX_TURNS:-}
-      - VERBOSE=${VERBOSE:-}
-      - LOG_DIR=${LOG_DIR:-/home/agent/agent_logs}
-      - RUN_ID=${RUN_ID:-}
-      - PLUGIN_DIRS=/app/starsim-plugin
+      <<: *common-env
+      CLAUDE_MODEL: claude-sonnet-4-6
+      PORT: "9100"
     volumes:
-      - agent-starsim-logs:/home/agent/agent_logs
+      - sonnet-logs:/home/agent/agent_logs
+
+  # Port 9101: Sonnet, with plugin
+  sonnet-plugin:
+    <<: *common
+    ports: ["9101:9101"]
+    environment:
+      <<: *common-env
+      CLAUDE_MODEL: claude-sonnet-4-6
+      PORT: "9101"
+      PLUGIN_DIRS: /app/starsim-plugin
+    volumes:
+      - sonnet-plugin-logs:/home/agent/agent_logs
+      - ./starsim_ai/plugins/starsim:/app/starsim-plugin:ro
+
+  # Port 9102: Opus, no plugin
+  opus:
+    <<: *common
+    ports: ["9102:9102"]
+    environment:
+      <<: *common-env
+      CLAUDE_MODEL: claude-opus-4-6
+      PORT: "9102"
+    volumes:
+      - opus-logs:/home/agent/agent_logs
+
+  # Port 9103: Opus, with plugin
+  opus-plugin:
+    <<: *common
+    ports: ["9103:9103"]
+    environment:
+      <<: *common-env
+      CLAUDE_MODEL: claude-opus-4-6
+      PORT: "9103"
+      PLUGIN_DIRS: /app/starsim-plugin
+    volumes:
+      - opus-plugin-logs:/home/agent/agent_logs
       - ./starsim_ai/plugins/starsim:/app/starsim-plugin:ro
 
 volumes:
-  agent-logs:
-  agent-starsim-logs:
+  sonnet-logs:
+  sonnet-plugin-logs:
+  opus-logs:
+  opus-plugin-logs:

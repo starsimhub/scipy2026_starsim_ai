@@ -13,7 +13,7 @@ Starsim separates the concept of products (what is administered, e.g., a vaccine
 
 ### Function Header
 ```python
-def compare_sir_vaccination(n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_efficacy: float = 0.5, vx_prob: float = 0.2, vx_start_year: int = 2015) -> dict[str, float]:
+def compare_sir_vaccination(n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_efficacy=0.5, vx_prob=0.2, vx_start_year=2015):
 ```
 
 ### Docstring
@@ -70,12 +70,12 @@ assert isinstance(result['vaccinated_infections'], float), 'vaccinated_infection
 
 ### Gold Solution
 ```python
-def compare_sir_vaccination(n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_efficacy: float = 0.5, vx_prob: float = 0.2, vx_start_year: int = 2015) -> dict[str, float]:
+def compare_sir_vaccination(n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_efficacy=0.5, vx_prob=0.2, vx_start_year=2015):
     import starsim as ss
     pars = dict(
         n_agents=n_agents,
-        birth_rate=20,
-        death_rate=15,
+        birth_rate=ss.peryear(20),
+        death_rate=ss.peryear(15),
         networks=dict(type='random', n_contacts=n_contacts),
         diseases=dict(type='sir', dur_inf=dur_inf, beta=beta),
         start=2000,
@@ -105,7 +105,7 @@ Starsim's built-in vaccine products (e.g., ss.simple_vx) work for standard SIR-t
 
 ### Function Header
 ```python
-def run_sis_vaccine_sim(n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_efficacy: float = 0.9, vx_prob: float = 1.0, vx_start_year: int = 2015) -> ss.Sim:
+def run_sis_vaccine_sim(n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_efficacy=0.9, vx_prob=1.0, vx_start_year=2015):
 ```
 
 ### Docstring
@@ -161,7 +161,7 @@ assert sim.pars.n_agents == 1_000, 'Population size should match n_agents'
 
 ### Gold Solution
 ```python
-def run_sis_vaccine_sim(n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_efficacy: float = 0.9, vx_prob: float = 1.0, vx_start_year: int = 2015) -> ss.Sim:
+def run_sis_vaccine_sim(n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_efficacy=0.9, vx_prob=1.0, vx_start_year=2015):
     import starsim as ss
 
     class sis_vaccine(ss.Vx):
@@ -177,8 +177,8 @@ def run_sis_vaccine_sim(n_agents: int = 5_000, n_contacts: int = 4, beta: float 
     my_intv = ss.routine_vx(start_year=vx_start_year, prob=vx_prob, product=my_vaccine)
     pars = dict(
         n_agents=n_agents,
-        birth_rate=20,
-        death_rate=15,
+        birth_rate=ss.peryear(20),
+        death_rate=ss.peryear(15),
         networks=dict(type='random', n_contacts=n_contacts),
         diseases=dict(type='sis', dur_inf=dur_inf, beta=beta),
         start=2000,
@@ -201,7 +201,7 @@ Finding the minimum vaccine efficacy needed to eliminate a disease is a key ques
 
 ### Function Header
 ```python
-def sweep_sis_vaccine_efficacy(efficacies: list[float], n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_start_year: int = 2015) -> dict[float, dict]:
+def sweep_sis_vaccine_efficacy(efficacies, n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_start_year=2015):
 ```
 
 ### Docstring
@@ -257,7 +257,7 @@ assert results[0.9]['cum_infections'] <= results[0.1]['cum_infections'], 'Higher
 
 ### Gold Solution
 ```python
-def sweep_sis_vaccine_efficacy(efficacies: list[float], n_agents: int = 5_000, n_contacts: int = 4, beta: float = 0.1, dur_inf: float = 10, vx_start_year: int = 2015) -> dict[float, dict]:
+def sweep_sis_vaccine_efficacy(efficacies, n_agents=5_000, n_contacts=4, beta=0.1, dur_inf=10, vx_start_year=2015):
     import starsim as ss
 
     class sis_vaccine(ss.Vx):
@@ -275,8 +275,8 @@ def sweep_sis_vaccine_efficacy(efficacies: list[float], n_agents: int = 5_000, n
         my_intv = ss.routine_vx(start_year=vx_start_year, prob=1.0, product=my_vaccine)
         pars = dict(
             n_agents=n_agents,
-            birth_rate=20,
-            death_rate=15,
+            birth_rate=ss.peryear(20),
+            death_rate=ss.peryear(15),
             networks=dict(type='random', n_contacts=n_contacts),
             diseases=dict(type='sis', dur_inf=dur_inf, beta=beta),
             start=2000,
@@ -286,7 +286,7 @@ def sweep_sis_vaccine_efficacy(efficacies: list[float], n_agents: int = 5_000, n
         sim.run()
         results[eff] = {
             'cum_infections': float(sim.results.sis.cum_infections[-1]),
-            'eradicated': float(sim.results.sis.new_infections[-1]) == 0,
+            'eradicated': float(sim.results.sis.new_infections[-1]) < 0.5,
         }
     return results
 ```

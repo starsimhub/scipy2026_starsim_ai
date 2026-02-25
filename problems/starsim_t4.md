@@ -13,7 +13,7 @@ The p_death parameter in Starsim's SIR model controls the probability that an in
 
 ### Function Header
 ```python
-def compare_mortality_rates(p_deaths: list[float], n_agents: int = 5_000, beta: float = 0.2, init_prev: float = 0.1, dur_inf: float = 10) -> dict[float, dict]:
+def compare_mortality_rates(p_deaths, n_agents=5_000, beta=0.2, init_prev=0.1, dur_inf=10):
 ```
 
 ### Docstring
@@ -62,7 +62,7 @@ assert all(v['cum_infections'] > 0 for v in results.values()), 'All simulations 
 
 ### Gold Solution
 ```python
-def compare_mortality_rates(p_deaths: list[float], n_agents: int = 5_000, beta: float = 0.2, init_prev: float = 0.1, dur_inf: float = 10) -> dict[float, dict]:
+def compare_mortality_rates(p_deaths, n_agents=5_000, beta=0.2, init_prev=0.1, dur_inf=10):
     import starsim as ss
     results = {}
     for pd in p_deaths:
@@ -88,7 +88,7 @@ The SEIR model extends SIR by adding an exposed (E) compartment between suscepti
 
 ### Function Header
 ```python
-def create_seir_sim(n_agents: int = 5_000, beta: float = 0.1, init_prev: float = 0.05, dur_exp: float = 0.5, dur_inf: float = 10, p_death: float = 0.0) -> ss.Sim:
+def create_seir_sim(n_agents=5_000, beta=0.1, init_prev=0.05, dur_exp=0.5, dur_inf=10, p_death=0.0):
 ```
 
 ### Docstring
@@ -144,7 +144,7 @@ assert sim.pars.n_agents == 1_000, 'Population size should match n_agents'
 
 ### Gold Solution
 ```python
-def create_seir_sim(n_agents: int = 5_000, beta: float = 0.1, init_prev: float = 0.05, dur_exp: float = 0.5, dur_inf: float = 10, p_death: float = 0.0) -> ss.Sim:
+def create_seir_sim(n_agents=5_000, beta=0.1, init_prev=0.05, dur_exp=0.5, dur_inf=10, p_death=0.0):
     import starsim as ss
 
     class SEIR(ss.SIR):
@@ -176,6 +176,7 @@ def create_seir_sim(n_agents: int = 5_000, beta: float = 0.1, init_prev: float =
         def set_prognoses(self, uids, sources=None):
             super().set_prognoses(uids, sources)
             ti = self.ti
+            self.infected[uids] = False
             self.susceptible[uids] = False
             self.exposed[uids] = True
             self.ti_exposed[uids] = ti
@@ -206,7 +207,7 @@ The exposure (latent) duration in an SEIR model controls how long agents remain 
 
 ### Function Header
 ```python
-def compare_exposure_durations(dur_exps: list[float], n_agents: int = 5_000, beta: float = 0.1, init_prev: float = 0.05) -> dict[float, dict]:
+def compare_exposure_durations(dur_exps, n_agents=5_000, beta=0.1, init_prev=0.05):
 ```
 
 ### Docstring
@@ -258,7 +259,7 @@ assert all(v['peak_exposed'] > 0 for v in results.values()), 'All simulations sh
 
 ### Gold Solution
 ```python
-def compare_exposure_durations(dur_exps: list[float], n_agents: int = 5_000, beta: float = 0.1, init_prev: float = 0.05) -> dict[float, dict]:
+def compare_exposure_durations(dur_exps, n_agents=5_000, beta=0.1, init_prev=0.05):
     import starsim as ss
     import numpy as np
 
@@ -291,6 +292,7 @@ def compare_exposure_durations(dur_exps: list[float], n_agents: int = 5_000, bet
         def set_prognoses(self, uids, sources=None):
             super().set_prognoses(uids, sources)
             ti = self.ti
+            self.infected[uids] = False
             self.susceptible[uids] = False
             self.exposed[uids] = True
             self.ti_exposed[uids] = ti
@@ -326,7 +328,7 @@ The SEIRS model adds waning immunity to the SEIR framework. After recovering, ag
 
 ### Function Header
 ```python
-def create_seirs_sim(n_agents: int = 5_000, beta: float = 0.2, init_prev: float = 0.1, dur_exp: float = 0.5, dur_inf: float = 5, dur_imm: float = 2.0, p_death: float = 0.0) -> ss.Sim:
+def create_seirs_sim(n_agents=5_000, beta=0.2, init_prev=0.1, dur_exp=0.5, dur_inf=5, dur_imm=2.0, p_death=0.0):
 ```
 
 ### Docstring
@@ -384,7 +386,7 @@ assert short.results.seirs.cum_infections[-1] >= long_.results.seirs.cum_infecti
 
 ### Gold Solution
 ```python
-def create_seirs_sim(n_agents: int = 5_000, beta: float = 0.2, init_prev: float = 0.1, dur_exp: float = 0.5, dur_inf: float = 5, dur_imm: float = 2.0, p_death: float = 0.0) -> ss.Sim:
+def create_seirs_sim(n_agents=5_000, beta=0.2, init_prev=0.1, dur_exp=0.5, dur_inf=5, dur_imm=2.0, p_death=0.0):
     import starsim as ss
 
     class SEIR(ss.SIR):
@@ -416,6 +418,7 @@ def create_seirs_sim(n_agents: int = 5_000, beta: float = 0.2, init_prev: float 
         def set_prognoses(self, uids, sources=None):
             super().set_prognoses(uids, sources)
             ti = self.ti
+            self.infected[uids] = False
             self.susceptible[uids] = False
             self.exposed[uids] = True
             self.ti_exposed[uids] = ti

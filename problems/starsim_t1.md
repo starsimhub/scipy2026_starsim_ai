@@ -13,7 +13,7 @@ The SIR (susceptible-infectious-recovered) model is a fundamental compartmental 
 
 ### Function Header
 ```python
-def create_sir_sim(n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> ss.Sim:
+def create_sir_sim(n_agents=10_000, n_contacts=10, init_prev=0.01, beta=0.05):
 ```
 
 ### Docstring
@@ -60,7 +60,7 @@ assert 'n_recovered' in sim.results.sir, 'Results should contain n_recovered'
 
 ### Gold Solution
 ```python
-def create_sir_sim(n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> ss.Sim:
+def create_sir_sim(n_agents=10_000, n_contacts=10, init_prev=0.01, beta=0.05):
     import starsim as ss
     pars = dict(
         n_agents=n_agents,
@@ -84,7 +84,7 @@ The SIS (susceptible-infectious-susceptible) model differs from SIR in that reco
 
 ### Function Header
 ```python
-def create_sis_sim(n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> ss.Sim:
+def create_sis_sim(n_agents=10_000, n_contacts=10, init_prev=0.01, beta=0.05):
 ```
 
 ### Docstring
@@ -124,7 +124,7 @@ assert sim.results.sis.cum_infections[-1] > 0, 'There should be infections in th
 
 ### Gold Solution
 ```python
-def create_sis_sim(n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> ss.Sim:
+def create_sis_sim(n_agents=10_000, n_contacts=10, init_prev=0.01, beta=0.05):
     import starsim as ss
     pars = dict(
         n_agents=n_agents,
@@ -148,7 +148,7 @@ The transmission rate beta is a key parameter in disease modeling that controls 
 
 ### Function Header
 ```python
-def compare_beta(betas: list[float], n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01) -> dict[float, float]:
+def compare_beta(betas, n_agents=10_000, n_contacts=10, init_prev=0.01):
 ```
 
 ### Docstring
@@ -188,7 +188,7 @@ assert all(v > 0 for v in results.values()), 'All simulations should produce som
 
 ### Gold Solution
 ```python
-def compare_beta(betas: list[float], n_agents: int = 10_000, n_contacts: int = 10, init_prev: float = 0.01) -> dict[float, float]:
+def compare_beta(betas, n_agents=10_000, n_contacts=10, init_prev=0.01):
     import starsim as ss
     results = {}
     for beta in betas:
@@ -215,7 +215,7 @@ Agent-based models like Starsim are stochastic — each simulation run produces 
 
 ### Function Header
 ```python
-def compare_population_sizes(n_agents_list: list[int], n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> dict[int, dict]:
+def compare_population_sizes(n_agents_list, n_contacts=10, init_prev=0.01, beta=0.05):
 ```
 
 ### Docstring
@@ -263,7 +263,7 @@ assert 0 < results[1_000]['peak_prevalence'] <= 1.0, 'Peak prevalence should be 
 
 ### Gold Solution
 ```python
-def compare_population_sizes(n_agents_list: list[int], n_contacts: int = 10, init_prev: float = 0.01, beta: float = 0.05) -> dict[int, dict]:
+def compare_population_sizes(n_agents_list, n_contacts=10, init_prev=0.01, beta=0.05):
     import starsim as ss
     import numpy as np
     results = {}
