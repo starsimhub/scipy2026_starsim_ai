@@ -22,7 +22,7 @@ from a2a.types import (
     AgentSkill,
 )
 
-from ssai.claude_code_executor import ClaudeCodeConfig, ClaudeCodeExecutor
+from claude_a2a.claude_code_executor import ClaudeCodeConfig, ClaudeCodeExecutor
 
 logging.basicConfig(
     level=logging.INFO,

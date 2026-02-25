@@ -20,11 +20,8 @@ dependencies = [
 ]
 
 [project.scripts]
-scipy2026-starsim-ai = "ssai:main"
-start-claude-code-server = "ssai.claude_code_server:main"
-
-[tool.uv.build-backend]
-module-name = "ssai"
+scipy2026-starsim-ai = "claude_a2a:main"
+start-claude-code-server = "claude_a2a.claude_code_server:main"
 
 [build-system]
 requires = ["uv_build>=0.9.10,<0.10.0"]

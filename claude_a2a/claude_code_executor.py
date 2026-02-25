@@ -81,7 +81,7 @@ MCP_REGISTRY: dict[str, dict[str, Any]] = {
     "secret": {
         "type": "stdio",
         "command": "python",
-        "args": ["-m", "ssai.mcp_secret"],
+        "args": ["-m", "claude_a2a.mcp_secret"],
     },
 }
 

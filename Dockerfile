@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir \
 # Copy only the A2A server source (no eval code, no problems/answers)
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
 COPY README.md pyproject.toml ./
-COPY src/ src/
+COPY claude_a2a/ claude_a2a/
 RUN uv pip install --no-deps -e . --system
 
 # Copy entrypoint script
