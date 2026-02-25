@@ -3,13 +3,14 @@ Evaluate performance of different models/configurations.
 """
 
 # %%
-from rich import print
-
 import numpy as np
+import sciris as sc
+from rich import print
 import matplotlib.pyplot as plt
-from inspect_ai.analysis import evals_df, samples_df
+from inspect_ai.analysis import evals_df, samples_df, Column
 
-df_eval = evals_df('../logs')
+columns = [Column(c) for c in ['task_name', 'model', 'score_headline_value']]
+df_eval = evals_df('../logs', columns=columns)
 # df_samples = samples_df('../logs')
 
 # %%
@@ -39,7 +40,13 @@ print(task_names)
 # %%
 task_name = 'starsim_agent_benchmark'
 df_task = df_eval[df_eval['task_name'] == task_name]
+print('HI')
+print(df_task['task_name'].unique())
+print('OK')
 df_task = df_task.sort_values(by='model')
+print(df_task)
+print('and')
+sc.dataframe(df_task).disp()
 
 fig = plt.figure(figsize=(5,3))
 ax = plt.gca()
