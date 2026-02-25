@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Confirm that the Starsim-AI plugin is available to one Docker server, and not to the other.
 
 Sends a plugin-inquiry prompt to two A2A servers and checks the responses.
@@ -10,12 +11,13 @@ Usage:
 import sys
 import argparse
 import httpx
-from uuid import uuid4
+import sciris as sc
 
 
 QUESTION = (
     "What version of the starsim plugin are you using, if any? "
-    "Start your answer with YES or NO, then explain briefly."
+    "Start your answer with YES or NO. If YES, also give the plugin version number. "
+    "Either way, explain your answer briefly."
 )
 
 
@@ -29,7 +31,7 @@ def query_server(url: str, timeout: int = 120) -> str:
             "message": {
                 "role": "user",
                 "parts": [{"kind": "text", "text": QUESTION}],
-                "messageId": str(uuid4()),
+                "messageId": str(sc.uuid()),
             },
         },
     }
@@ -76,20 +78,20 @@ def main():
             ok = False
             continue
 
-        print(f"  Response: {response[:500]}")
+        print(f"  Response: {response}")
 
         first_word = response.strip().split()[0].strip(".,!:").upper() if response.strip() else ""
         if expects_plugin:
             if first_word == "YES":
-                print("  PASS: server reports having the plugin")
+                sc.printgreen("  PASS: server reports having the plugin")
             else:
-                print("  FAIL: expected plugin but response doesn't start with YES")
+                sc.printred("  FAIL: expected plugin but response doesn't start with YES")
                 ok = False
         else:
             if first_word == "NO":
-                print("  PASS: server reports no plugin")
+                sc.printgreen("  PASS: server reports no plugin")
             else:
-                print("  FAIL: expected no plugin but response doesn't start with NO")
+                sc.printred("  FAIL: expected no plugin but response doesn't start with NO")
                 ok = False
 
     print(f"\n{'='*60}")
