@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Katherine Rosenfeld", email = "krosenf@gmail.com" }
+    { name = "Katherine Rosenfeld", email = "info@starsim.org" },
+    { name = "Cliff Kerr" },
+    { name = "Jessica Lundin" },
+    { name = "Robyn Stuart" },
+    { name = "Romesh Abeysuriya" },
 ]
 requires-python = ">=3.12"
 dependencies = [

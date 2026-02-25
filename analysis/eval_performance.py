@@ -37,7 +37,7 @@ print(task_names)
 # ax.set_title('Starsim Agent Benchmark')
 
 # %%
-task_name = 'starsim_benchmark'
+task_name = 'starsim_agent_benchmark'
 df_task = df_eval[df_eval['task_name'] == task_name]
 df_task = df_task.sort_values(by='model')
 
