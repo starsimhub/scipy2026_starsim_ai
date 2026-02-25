@@ -199,6 +199,7 @@ class ClaudeCodeConfig:
         self.system_prompt = system_prompt or (
             "You are a coding agent exposed via the A2A protocol. "
             "Complete the user's request thoroughly. "
+            "Write all files in the current working directory. "
             "When you produce files, mention their paths explicitly."
         )
         self.allowed_tools = allowed_tools or [
