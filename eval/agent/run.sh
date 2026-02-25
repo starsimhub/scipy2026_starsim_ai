@@ -23,8 +23,17 @@ urls=(
 
 for url in "${urls[@]}"; do
     for model in "${models[@]}"; do
+        echo ""
+        echo -e "\033[1;36m========================================\033[0m"
+        echo -e "\033[1;36m  Model: $model\033[0m"
+        echo -e "\033[1;36m  URL:   $url\033[0m"
+        echo -e "\033[1;36m========================================\033[0m"
+        eval_start=$SECONDS
         inspect eval eval/agent/starsim.py --model $model -T agent_url=$url
+        echo "Done in $(( SECONDS - eval_start )) seconds"
     done
 done
 
-echo "Done: $(( (SECONDS - START) / 60 )) minutes"
+elapsed=$(( SECONDS - START ))
+echo ""
+echo -e "\033[1;32mAll evaluations complete: $(( elapsed / 60 ))m $(( elapsed % 60 ))s\033[0m"
