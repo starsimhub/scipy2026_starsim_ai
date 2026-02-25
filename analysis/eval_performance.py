@@ -7,10 +7,9 @@ import numpy as np
 import sciris as sc
 from rich import print
 import matplotlib.pyplot as plt
-from inspect_ai.analysis import evals_df, samples_df, Column
+from inspect_ai.analysis import evals_df, samples_df
 
-columns = [Column(c) for c in ['task_name', 'model', 'score_headline_value']]
-df_eval = evals_df('../logs', columns=columns)
+df_eval = evals_df('../logs')
 # df_samples = samples_df('../logs')
 
 # %%
