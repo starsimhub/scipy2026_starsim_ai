@@ -31,7 +31,7 @@ services:
       - PLUGIN_DIRS=/app/starsim-plugin
     volumes:
       - agent-starsim-logs:/home/agent/agent_logs
-      - ./starsim-plugin:/app/starsim-plugin:ro
+      - ./starsim_ai/plugins/starsim:/app/starsim-plugin:ro
 
 volumes:
   agent-logs:

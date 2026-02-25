@@ -27,6 +27,12 @@ fi
 if [ -n "$PLUGIN_DIRS" ]; then
     IFS=',' read -ra DIRS <<< "$PLUGIN_DIRS"
     for dir in "${DIRS[@]}"; do
+        if [ ! -d "$dir" ]; then
+            echo "ERROR: Plugin directory '$dir' not found." >&2
+            echo "Did you forget to initialize the git submodule? Run:" >&2
+            echo "  git submodule init && git submodule update" >&2
+            exit 1
+        fi
         args+=("--plugin-dir" "$dir")
     done
 fi

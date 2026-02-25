@@ -1,0 +1,3 @@
+[submodule "starsim_ai"]
+	path = starsim_ai
+	url = https://github.com/starsimhub/starsim_ai.git

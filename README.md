@@ -6,6 +6,18 @@ Evaluates the performance of LLMs for understanding and building Starsim models,
 
 The recommended way to run the Claude Code A2A server is with Docker, which provides filesystem isolation and a reproducible environment.
 
+This repo uses a **git submodule** for the Starsim plugin (from [starsimhub/starsim_ai](https://github.com/starsimhub/starsim_ai)). Clone with:
+
+```bash
+git clone --recurse-submodules https://github.com/<your-org>/scipy2026_starsim_ai.git
+```
+
+If you already cloned without `--recurse-submodules`:
+
+```bash
+git submodule init && git submodule update
+```
+
 ### 1. Set up the environment
 
 You will need at least an Anthropic API key, and optionally also an OpenAI one for running the comparison. Set these via environment variable or a `.env` file (loaded automatically via `python-dotenv`). 
@@ -295,7 +307,7 @@ The project includes an [A2A](https://google.github.io/A2A/) (Agent-to-Agent) se
 - **Cancellation** — supports async cancellation via `asyncio.Event`.
 - **Configurable tools** — defaults to Read, Write, Edit, MultiEdit, Bash, Glob, Grep, and WebSearch; runs with `bypassPermissions` mode.
 - **MCP extensibility** — pluggable MCP servers for domain-specific capabilities (an example "secret" server is included in `src/ssai/mcp_secret.py`).
-- **Plugin support** — load Claude Code plugins via `--plugin-dir` (or `PLUGIN_DIRS` env var). The `agent-starsim` Docker service uses this to enable the Starsim plugin from `starsim-plugin/`.
+- **Plugin support** — load Claude Code plugins via `--plugin-dir` (or `PLUGIN_DIRS` env var). The `agent-starsim` Docker service uses this to enable the Starsim plugin from the `starsim_ai` submodule (`starsim_ai/plugins/starsim/`).
 - **Execution logging** — optional structured JSONL logs capturing prompts, tool usage, assistant responses, and errors for each task (see [Execution Logging](#execution-logging)).
 
 ### Execution Logging
