@@ -13,7 +13,7 @@ In basic epidemic models, the population is often fixed — no one is born or di
 
 ### Function Header
 ```python
-def create_sir_with_demographics(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 15, beta: float = 0.05, init_prev: float = 0.01) -> ss.Sim:
+def create_sir_with_demographics(n_agents=5_000, birth_rate=20, death_rate=15, beta=0.05, init_prev=0.01):
 ```
 
 ### Docstring
@@ -71,12 +71,12 @@ assert 'new_deaths' in sim.results, 'Results should track deaths'
 
 ### Gold Solution
 ```python
-def create_sir_with_demographics(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 15, beta: float = 0.05, init_prev: float = 0.01) -> ss.Sim:
+def create_sir_with_demographics(n_agents=5_000, birth_rate=20, death_rate=15, beta=0.05, init_prev=0.01):
     import starsim as ss
     pars = dict(
         n_agents=n_agents,
-        birth_rate=birth_rate,
-        death_rate=death_rate,
+        birth_rate=ss.peryear(birth_rate),
+        death_rate=ss.peryear(death_rate),
         networks='random',
         diseases=dict(type='sir', init_prev=init_prev, beta=beta),
         start=2020,
@@ -99,7 +99,7 @@ Just as diseases and networks can be configured using component objects (Tutoria
 
 ### Function Header
 ```python
-def create_component_demographics(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 15, beta: float = 0.05, init_prev: float = 0.01) -> ss.Sim:
+def create_component_demographics(n_agents=5_000, birth_rate=20, death_rate=15, beta=0.05, init_prev=0.01):
 ```
 
 ### Docstring
@@ -157,11 +157,11 @@ assert initial != final, 'Population should change over time with demographics'
 
 ### Gold Solution
 ```python
-def create_component_demographics(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 15, beta: float = 0.05, init_prev: float = 0.01) -> ss.Sim:
+def create_component_demographics(n_agents=5_000, birth_rate=20, death_rate=15, beta=0.05, init_prev=0.01):
     import starsim as ss
     people = ss.People(n_agents=n_agents)
-    births = ss.Births(birth_rate=birth_rate)
-    deaths = ss.Deaths(death_rate=death_rate)
+    births = ss.Births(birth_rate=ss.peryear(birth_rate))
+    deaths = ss.Deaths(death_rate=ss.peryear(death_rate))
     sir = ss.SIR(init_prev=init_prev, beta=beta)
     network = ss.RandomNet()
     sim = ss.Sim(people=people, diseases=sir, networks=network, demographics=[births, deaths], start=2020, stop=2040)
@@ -181,7 +181,7 @@ Starsim's total_pop parameter enables statistical scaling: the simulation runs w
 
 ### Function Header
 ```python
-def project_niger_population(total_pop: float = 24e6, birth_rate: float = 45, death_rate: float = 9, start: int = 2020, stop: int = 2040) -> float:
+def project_niger_population(total_pop=24e6, birth_rate=45, death_rate=9, start=2020, stop=2040):
 ```
 
 ### Docstring
@@ -234,14 +234,14 @@ assert result > 24, 'Population should grow beyond the initial 24 million'
 
 ### Gold Solution
 ```python
-def project_niger_population(total_pop: float = 24e6, birth_rate: float = 45, death_rate: float = 9, start: int = 2020, stop: int = 2040) -> float:
+def project_niger_population(total_pop=24e6, birth_rate=45, death_rate=9, start=2020, stop=2040):
     import starsim as ss
     pars = dict(
         start=start,
         stop=stop,
         total_pop=total_pop,
-        birth_rate=birth_rate,
-        death_rate=death_rate,
+        birth_rate=ss.peryear(birth_rate),
+        death_rate=ss.peryear(death_rate),
     )
     sim = ss.Sim(pars)
     sim.run()
@@ -260,7 +260,7 @@ Without demographics, a population is closed — no new susceptible individuals 
 
 ### Function Header
 ```python
-def compare_demographics_impact(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 10, beta: float = 0.05, init_prev: float = 0.01) -> dict[str, dict]:
+def compare_demographics_impact(n_agents=5_000, birth_rate=20, death_rate=10, beta=0.05, init_prev=0.01):
 ```
 
 ### Docstring
@@ -318,7 +318,7 @@ assert results['with_demographics']['cum_infections'] > 0, 'With-demographics sc
 
 ### Gold Solution
 ```python
-def compare_demographics_impact(n_agents: int = 5_000, birth_rate: float = 20, death_rate: float = 10, beta: float = 0.05, init_prev: float = 0.01) -> dict[str, dict]:
+def compare_demographics_impact(n_agents=5_000, birth_rate=20, death_rate=10, beta=0.05, init_prev=0.01):
     import starsim as ss
     results = {}
     # Without demographics
@@ -339,8 +339,8 @@ def compare_demographics_impact(n_agents: int = 5_000, birth_rate: float = 20, d
         n_agents=n_agents,
         diseases=dict(type='sir', init_prev=init_prev, beta=beta),
         networks='random',
-        birth_rate=birth_rate,
-        death_rate=death_rate,
+        birth_rate=ss.peryear(birth_rate),
+        death_rate=ss.peryear(death_rate),
         start=2020,
         stop=2040,
     )

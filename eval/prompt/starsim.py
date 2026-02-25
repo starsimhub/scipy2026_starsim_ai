@@ -52,7 +52,7 @@ from eval.shared import (
 
 
 PROMPT_TEMPLATE = textwrap.dedent("""\
-    Write a Python function that solves the following problem.
+    Write a Python function that solves the following Starsim problem.
 
     ## Dependencies
     {dependencies}
