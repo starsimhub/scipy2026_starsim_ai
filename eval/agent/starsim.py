@@ -108,7 +108,10 @@ AGENT_PROMPT_TEMPLATE = textwrap.dedent("""\
     1. Write the function implementation
     2. Test it against the provided test cases
     3. Fix any issues and re-test until all tests pass
-    4. Return your final function implementation in a ```python``` code block
+    
+    IMPORTANT: Return ONLY the function implementation inside a single ```python``` code block.
+    Include any necessary import statements inside the function body.
+    DO NOT include any explanations, comments, or text outside the code block.
 """)
 
 

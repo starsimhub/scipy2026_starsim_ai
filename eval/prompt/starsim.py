@@ -70,7 +70,8 @@ PROMPT_TEMPLATE = textwrap.dedent("""\
 
     {test_cases_section}
 
-    Return ONLY the function implementation inside a single ```python``` code block.
+    IMPORTANT: Return ONLY the function implementation inside a single ```python``` code block.
+    DO NOT include any explanations, comments, or text outside the code block.
     Include any necessary import statements inside the function body.
 """)
 

@@ -39,7 +39,7 @@ for entry in "${EVALS[@]}"; do
 done
 tmux kill-window -t "$SESSION:0"  # remove the empty initial window
 
-echo "Launched ${#EVALS[@]} evals in tmux session '$SESSION'"
+echo "Launched ${#EVALS[@]} evals in tmux session '$SESSION' and temp folder $DONE_DIR:"
 echo "  tmux attach -t $SESSION        # attach"
 echo "  Ctrl-b n/p                     # switch windows"
 echo "  Ctrl-b d                       # detach"
