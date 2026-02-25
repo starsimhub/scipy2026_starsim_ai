@@ -70,19 +70,20 @@ python -m claude_a2a.claude_code_server --port 9100
 #### Usage
 
 ```bash
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+inspect eval eval/agent/starsim.py -T model=sonnet
 ```
 
 #### Options
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-T agent_url=<url>` | URL of the A2A server | `http://localhost:9100` |
+| `-T model=<model>` | Agent model: `sonnet` or `opus` | `sonnet` |
+| `-T with_plugin=True/False` | Use plugin-enabled server variant | `False` |
 | `-T problems_dir=<path>` | Path to problems JSONL directory | `./problems` |
 | `-T tutorial=<id>` | Run only a specific tutorial (e.g., `starsim_t1`) | all |
 | `-T with_background=True/False` | Include background context in prompts | `True` |
 | `-T timeout=<seconds>` | Timeout per test case execution | `60` |
-| `-T request_timeout=<seconds>` | HTTP timeout for agent requests | `300` |
+| `-T request_timeout=<seconds>` | HTTP timeout for agent requests | `600` |
 | `--limit <n>` | Limit number of samples to evaluate | all |
 
 #### Examples
@@ -91,7 +92,7 @@ Run a single tutorial against the agent:
 
 ```bash
 inspect eval eval/agent/starsim.py \
-    -T agent_url=http://localhost:9100 \
+    -T model=sonnet \
     -T tutorial=starsim_t1
 ```
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run evaluation for agents with different models and configurations -- for debugging
+# Run evaluation for agents with different models and configurations
 #
 # You need to run `docker compose up` before running this script; see README.md for details.
 #
@@ -12,26 +12,13 @@ START=$SECONDS
 
 for with_plugin in "False" "True"; do
     for model in "sonnet" "opus"; do
-        if [ "$model" = "sonnet" ]; then
-            base_port=9100
-        else
-            base_port=9102
-        fi
-        if [ "$with_plugin" = "True" ]; then
-            port=$((base_port + 1))
-        else
-            port=$base_port
-        fi
-        agent_url="http://localhost:$port"
-
         echo ""
         echo -e "\033[1;36m========================================\033[0m"
         echo -e "\033[1;36m  Model:  $model\033[0m"
         echo -e "\033[1;36m  Plugin: $with_plugin\033[0m"
-        echo -e "\033[1;36m  Agent:  $agent_url\033[0m"
         echo -e "\033[1;36m========================================\033[0m"
         eval_start=$SECONDS
-        inspect eval eval/agent/starsim.py --model anthropic/claude-${model}-4-6 --temperature 0 -T with_plugin=$with_plugin -T agent_url=$agent_url
+        inspect eval eval/agent/starsim.py --model anthropic/claude-${model}-4-6 --temperature 0 -T model=$model -T with_plugin=$with_plugin
         echo "Done in $(( SECONDS - eval_start )) seconds"
     done
 done

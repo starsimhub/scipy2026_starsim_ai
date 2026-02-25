@@ -11,18 +11,18 @@ Prerequisites:
     Start the Claude Code A2A server before running using the Docker Compose file:
         ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY docker compose up --build
 Usage:
-    inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+    inspect eval eval/agent/starsim.py -T model=sonnet
 
 Options:
-    -T agent_url=<url>           A2A server URL (default: http://localhost:9100)
+    -T model=<model>             Agent model: "sonnet" or "opus" (default: sonnet)
     -T problems_dir=<path>       Path to problems JSONL directory (default: ./problems)
     -T tutorial=<id>             Run only a specific tutorial, e.g. "starsim_t1"
     -T with_background=True      Include background context in prompts (default: True)
     -T with_test_cases=True      Include test cases in prompts (default: True)
-    -T timeout=60                Timeout ien seconds for test execution (default: 60)
+    -T timeout=60                Timeout in seconds for test execution (default: 60)
     -T request_timeout=600       HTTP timeout for agent requests (default: 600)
     -T max_retries=1             Max retries on HTTP timeout (default: 1)
-    -T with_plugin=False         Use plugin server (port 9101) and tag trial name (default: False)
+    -T with_plugin=False         Use plugin server and tag trial name (default: False)
 """
 
 from dotenv import load_dotenv
@@ -61,6 +61,27 @@ from eval.shared import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Port mapping: (model, with_plugin) → port
+# Docker services: sonnet(9100), sonnet-plugin(9101), opus(9102), opus-plugin(9103)
+AGENT_PORTS = {
+    ("sonnet", False): 9100,
+    ("sonnet", True): 9101,
+    ("opus", False): 9102,
+    ("opus", True): 9103,
+}
+
+VALID_MODELS = list({m for m, _ in AGENT_PORTS})
+
+
+def _get_agent_url(model: str, with_plugin: bool) -> str:
+    """Return the A2A server URL for a given model and plugin setting."""
+    key = (model, with_plugin)
+    if key not in AGENT_PORTS:
+        raise ValueError(
+            f"Unknown model {model!r}. Must be one of: {VALID_MODELS}"
+        )
+    return f"http://localhost:{AGENT_PORTS[key]}"
 
 
 AGENT_PROMPT_TEMPLATE = textwrap.dedent("""\
@@ -142,7 +163,7 @@ def _extract_a2a_response(data: dict) -> str:
 
 @solver
 def a2a_agent_solver(
-    agent_url: str = "http://localhost:9100",
+    agent_url: str,
     with_background: bool = True,
     with_test_cases: bool = True,
     request_timeout: int = 600,
@@ -299,7 +320,7 @@ def agent_scorer(timeout: int = 60):
 
 @task
 def starsim_agent_benchmark(
-    agent_url: str | None = None,
+    model: str = "sonnet",
     problems_dir: str = str(Path(__file__).resolve().parent.parent.parent / "problems"),
     tutorial: str | None = None,
     with_background: bool = True,
@@ -312,11 +333,11 @@ def starsim_agent_benchmark(
     """Starsim agent coding evaluation benchmark.
 
     Sends problems to a Claude Code A2A server and evaluates the
-    generated code against test cases.
+    generated code against test cases. The agent_url is determined
+    automatically from model and with_plugin.
 
     Args:
-        agent_url: URL of the A2A server. Defaults to port 9101 if
-            with_plugin is True, otherwise port 9100.
+        model: Agent model name — "sonnet" or "opus".
         problems_dir: Path to directory containing problem JSONL files.
         tutorial: Optional tutorial ID to filter (e.g. "starsim_t1").
         with_background: Whether to include background context in prompts.
@@ -324,10 +345,9 @@ def starsim_agent_benchmark(
         timeout: Timeout in seconds for each test case execution.
         request_timeout: HTTP timeout in seconds for agent requests.
         max_retries: Max retries on HTTP timeout (default: 1).
-        with_plugin: Use plugin server (port 9101) and tag trial name.
+        with_plugin: Use plugin server and tag trial name.
     """
-    if agent_url is None:
-        agent_url = "http://localhost:9101" if with_plugin else "http://localhost:9100"
+    agent_url = _get_agent_url(model, with_plugin)
 
     samples = load_problems(problems_dir, tutorial)
     dataset = MemoryDataset(samples=samples, name="starsim_agent")

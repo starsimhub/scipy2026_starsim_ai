@@ -18,7 +18,7 @@ docker compose up --build
 ./eval/agent/run.sh
 
 # Run a single evaluation
-inspect eval eval/agent/starsim.py -T agent_url=http://localhost:9100
+inspect eval eval/agent/starsim.py -T model=sonnet
 
 # Check plugin configuration
 python eval/agent/check_plugin.py
