@@ -125,7 +125,7 @@ def main():
         servers.append((label, url, expects_plugin, expected_model))
 
     # Query all servers in parallel
-    print('Starting check of:\n', servers)
+    print('Starting check of:\n' + sc.pp(servers, output=True))
     results = {}
     with ThreadPoolExecutor(max_workers=len(servers)) as pool:
         futures = {
