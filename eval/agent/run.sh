@@ -17,20 +17,15 @@ models=(
     "openai/gpt-5-mini-2025-08-07"
 )
 
-urls=(
-    "http://localhost:9100"  # without plugin
-    "http://localhost:9101"  # with plugin
-)
-
-for url in "${urls[@]}"; do
+for with_plugin in "False" "True"; do
     for model in "${models[@]}"; do
         echo ""
         echo -e "\033[1;36m========================================\033[0m"
-        echo -e "\033[1;36m  Model: $model\033[0m"
-        echo -e "\033[1;36m  URL:   $url\033[0m"
+        echo -e "\033[1;36m  Model:  $model\033[0m"
+        echo -e "\033[1;36m  Plugin: $with_plugin\033[0m"
         echo -e "\033[1;36m========================================\033[0m"
         eval_start=$SECONDS
-        inspect eval eval/agent/starsim.py --model $model -T agent_url=$url
+        inspect eval eval/agent/starsim.py --model $model -T with_plugin=$with_plugin
         echo "Done in $(( SECONDS - eval_start )) seconds"
     done
 done

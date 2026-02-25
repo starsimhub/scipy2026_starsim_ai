@@ -19,9 +19,10 @@ Options:
     -T tutorial=<id>             Run only a specific tutorial, e.g. "starsim_t1"
     -T with_background=True      Include background context in prompts (default: True)
     -T with_test_cases=True      Include test cases in prompts (default: True)
-    -T timeout=60                Timeout in seconds for test execution (default: 60)
+    -T timeout=60                Timeout ien seconds for test execution (default: 60)
     -T request_timeout=600       HTTP timeout for agent requests (default: 600)
     -T max_retries=1             Max retries on HTTP timeout (default: 1)
+    -T with_plugin=False         Use plugin server (port 9101) and tag trial name (default: False)
 """
 
 from dotenv import load_dotenv
@@ -146,8 +147,10 @@ def a2a_agent_solver(
     with_test_cases: bool = True,
     request_timeout: int = 600,
     max_retries: int = 1,
+    with_plugin: bool = False,
 ):
     """Solver that sends problems to a Claude Code A2A server."""
+    model_name = "a2a-agent_plugin" if with_plugin else "a2a-agent"
 
     async def solve(state: TaskState, generate: Generate) -> TaskState:
         meta = state.metadata
@@ -241,7 +244,7 @@ def a2a_agent_solver(
 
         # Set the output so the scorer can evaluate it
         state.output = ModelOutput.from_content(
-            model="a2a-agent",
+            model=model_name,
             content=response_text,
         )
         state.metadata["incomplete"] = incomplete_reason
@@ -296,7 +299,7 @@ def agent_scorer(timeout: int = 60):
 
 @task
 def starsim_agent_benchmark(
-    agent_url: str = "http://localhost:9100",
+    agent_url: str | None = None,
     problems_dir: str = str(Path(__file__).resolve().parent.parent.parent / "problems"),
     tutorial: str | None = None,
     with_background: bool = True,
@@ -304,6 +307,7 @@ def starsim_agent_benchmark(
     timeout: int = 60,
     request_timeout: int = 600,
     max_retries: int = 1,
+    with_plugin: bool = False,
 ) -> Task:
     """Starsim agent coding evaluation benchmark.
 
@@ -311,7 +315,8 @@ def starsim_agent_benchmark(
     generated code against test cases.
 
     Args:
-        agent_url: URL of the A2A server.
+        agent_url: URL of the A2A server. Defaults to port 9101 if
+            with_plugin is True, otherwise port 9100.
         problems_dir: Path to directory containing problem JSONL files.
         tutorial: Optional tutorial ID to filter (e.g. "starsim_t1").
         with_background: Whether to include background context in prompts.
@@ -319,7 +324,11 @@ def starsim_agent_benchmark(
         timeout: Timeout in seconds for each test case execution.
         request_timeout: HTTP timeout in seconds for agent requests.
         max_retries: Max retries on HTTP timeout (default: 1).
+        with_plugin: Use plugin server (port 9101) and tag trial name.
     """
+    if agent_url is None:
+        agent_url = "http://localhost:9101" if with_plugin else "http://localhost:9100"
+
     samples = load_problems(problems_dir, tutorial)
     dataset = MemoryDataset(samples=samples, name="starsim_agent")
 
@@ -331,6 +340,7 @@ def starsim_agent_benchmark(
             with_test_cases=with_test_cases,
             request_timeout=request_timeout,
             max_retries=max_retries,
+            with_plugin=with_plugin,
         ),
         scorer=agent_scorer(timeout=timeout),
     )
