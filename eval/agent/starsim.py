@@ -86,7 +86,8 @@ def _get_agent_url(model: str, with_plugin: bool) -> str:
 
 AGENT_PROMPT_TEMPLATE = textwrap.dedent("""\
     Write a Python function that solves the following Starsim problem.
-    You have access to a workspace where you can write and test code.
+    You have access to a workspace (your current working directory)
+    where you can write and test code.
 
     ## Dependencies
     {dependencies}
