@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run evaluation for agents with different models and configurations
+# Run evaluation for agents with different models and configurations -- for debugging
 #
 # You need to run `docker compose up` before running this script; see README.md for details.
 #
