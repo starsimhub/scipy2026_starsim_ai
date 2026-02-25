@@ -40,7 +40,7 @@ def claude_code_server():
     proc = subprocess.Popen(
         [
             sys.executable,
-            "-m", "ssai.claude_code_server",
+            "-m", "claude_a2a.claude_code_server",
             "--port", str(PORT),
         ],
         stdout=subprocess.PIPE,

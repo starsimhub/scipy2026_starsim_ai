@@ -6,7 +6,8 @@
 # NB: Claude plugins are only available via the agent implementation,
 # so this is the main use case.
 
-cd "$(dirname "$0")/../.." # go to root directory
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
+cd "$REPO_ROOT"
 START=$SECONDS
 
 models=(
@@ -16,15 +17,19 @@ models=(
     "openai/gpt-5-mini-2025-08-07"
 )
 
-urls=(
-    "http://localhost:9100"  # without plugin
-    "http://localhost:9101"  # with plugin
-)
-
-for url in "${urls[@]}"; do
+for with_plugin in "False" "True"; do
     for model in "${models[@]}"; do
-        inspect eval eval/agent/starsim.py --model $model -T agent_url=$url
+        echo ""
+        echo -e "\033[1;36m========================================\033[0m"
+        echo -e "\033[1;36m  Model:  $model\033[0m"
+        echo -e "\033[1;36m  Plugin: $with_plugin\033[0m"
+        echo -e "\033[1;36m========================================\033[0m"
+        eval_start=$SECONDS
+        inspect eval eval/agent/starsim.py --model $model -T with_plugin=$with_plugin
+        echo "Done in $(( SECONDS - eval_start )) seconds"
     done
 done
 
-echo "Done: $(( (SECONDS - START) / 60 )) minutes"
+elapsed=$(( SECONDS - START ))
+echo ""
+echo -e "\033[1;32mAll evaluations complete: $(( elapsed / 60 ))m $(( elapsed % 60 ))s\033[0m"

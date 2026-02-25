@@ -64,7 +64,7 @@ The agent receives the problem description, function signature, **and test cases
 Start the Claude Code A2A server:
 
 ```bash
-python -m ssai.claude_code_server --port 9100
+python -m claude_a2a.claude_code_server --port 9100
 ```
 
 #### Usage

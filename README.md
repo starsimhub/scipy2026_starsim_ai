@@ -2,7 +2,12 @@
 
 Evaluates the performance of LLMs for understanding and building Starsim models, with and without the Starsim-AI plugin.
 
-## Quick Start
+## *Super* quick start
+
+1. `./docker_up.sh` (start the Claude A2A servers that run the evaluation)
+2. `./run_eval.sh` (run the evaluation against different models + configurations)
+
+## Fairly quick Start
 
 The recommended way to run the Claude Code A2A server is with Docker, which provides filesystem isolation and a reproducible environment.
 
@@ -297,16 +302,16 @@ Problems span core Starsim use cases:
 
 The project includes an [A2A](https://google.github.io/A2A/) (Agent-to-Agent) server that exposes Claude Code as a discoverable, callable coding agent over HTTP.
 
-**Server** (`src/ssai/claude_code_server.py`): Builds an Agent Card advertising four skills — code generation, code review & bug fixing, shell & DevOps, and research & exploration — and serves it via a Starlette/Uvicorn application.
+**Server** (`claude_a2a/claude_code_server.py`): Builds an Agent Card advertising four skills — code generation, code review & bug fixing, shell & DevOps, and research & exploration — and serves it via a Starlette/Uvicorn application.
 
-**Executor** (`src/ssai/claude_code_executor.py`): Bridges the A2A protocol to Claude Code via the Claude Agent SDK. Key behaviors:
+**Executor** (`claude_a2a/claude_code_executor.py`): Bridges the A2A protocol to Claude Code via the Claude Agent SDK. Key behaviors:
 
 - **Workspace isolation** — each A2A task gets its own workspace directory for file operations.
 - **Multi-turn sessions** — tracks Claude Agent SDK session IDs per task so follow-up messages resume the same conversation context.
 - **Streaming progress** — emits intermediate `TaskStatusUpdateEvent`s as Claude works, including text output and tool-use notifications.
 - **Cancellation** — supports async cancellation via `asyncio.Event`.
 - **Configurable tools** — defaults to Read, Write, Edit, MultiEdit, Bash, Glob, Grep, and WebSearch; runs with `bypassPermissions` mode.
-- **MCP extensibility** — pluggable MCP servers for domain-specific capabilities (an example "secret" server is included in `src/ssai/mcp_secret.py`).
+- **MCP extensibility** — pluggable MCP servers for domain-specific capabilities (an example "secret" server is included in `claude_a2a/mcp_secret.py`).
 - **Plugin support** — load Claude Code plugins via `--plugin-dir` (or `PLUGIN_DIRS` env var). The `agent-starsim` Docker service uses this to enable the Starsim plugin from the `starsim_ai` submodule (`starsim_ai/plugins/starsim/`).
 - **Execution logging** — optional structured JSONL logs capturing prompts, tool usage, assistant responses, and errors for each task (see [Execution Logging](#execution-logging)).
 

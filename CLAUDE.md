@@ -34,7 +34,7 @@ uv run streamlit run app.py
 
 ## Project Structure
 
-- `src/ssai/` — Main source package
+- `claude_a2a/` — Main source package
   - `claude_code_server.py` — A2A HTTP server exposing Claude Code
   - `claude_code_executor.py` — Bridges A2A protocol to Claude Agent SDK
   - `mcp_secret.py` — Example MCP server
@@ -53,7 +53,7 @@ uv run streamlit run app.py
 
 - **Package manager:** UV (`uv sync`, `uv run`)
 - **Python:** 3.12+
-- **Source module:** `ssai` (mapped from `src/ssai/` via `uv_build`)
+- **Source module:** `claude_a2a`
 - **Problem editing:** Always edit `.md` files, then run `python3 problems/build_jsonl.py` to regenerate JSONL. Tests will fail if they're out of sync.
 - **Test markers:** `@pytest.mark.uses_llm` for tests requiring API keys. CI runs `pytest -m "not uses_llm"`.
 - **CI:** GitHub Actions on push/PR to `main` — runs `uv sync --dev` then `uv run pytest -m "not uses_llm" -v`

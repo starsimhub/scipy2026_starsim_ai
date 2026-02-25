@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Katherine Rosenfeld", email = "krosenf@gmail.com" }
+    { name = "Katherine Rosenfeld", email = "info@starsim.org" },
+    { name = "Cliff Kerr" },
+    { name = "Jessica Lundin" },
+    { name = "Robyn Stuart" },
+    { name = "Romesh Abeysuriya" },
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -20,15 +24,16 @@ dependencies = [
 ]
 
 [project.scripts]
-scipy2026-starsim-ai = "ssai:main"
-start-claude-code-server = "ssai.claude_code_server:main"
-
-[tool.uv.build-backend]
-module-name = "ssai"
+scipy2026-starsim-ai = "claude_a2a:main"
+start-claude-code-server = "claude_a2a.claude_code_server:main"
 
 [build-system]
 requires = ["uv_build>=0.9.10,<0.10.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "claude_a2a"
+module-root = ""
 
 [tool.pytest.ini_options]
 markers = [
