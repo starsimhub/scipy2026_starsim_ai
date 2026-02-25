@@ -6,7 +6,8 @@
 # NB: Claude plugins are only available via the agent implementation,
 # so this is the main use case.
 
-cd "$(dirname "$0")/../.." # go to root directory
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
+cd "$REPO_ROOT"
 START=$SECONDS
 
 models=(
