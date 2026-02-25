@@ -14,12 +14,13 @@ import httpx
 import sciris as sc
 
 
-QUESTION = (
-    "What version of the starsim plugin are you using, if any? "
-    "Start your answer with YES or NO. If YES, also give the plugin version number. "
-    "Either way, explain your answer briefly."
-)
-
+QUESTION = """
+What version of the Starsim AI plugin are you using, if any?
+Start your answer with YES or NO.
+Explain your answer briefly.
+If YES, also give the plugin version number (which this plugin provides in the starsim-dev skill).
+Then list the skills and MCP servers available.
+"""
 
 def query_server(url: str, timeout: int = 120) -> str:
     """Send the plugin question to an A2A server and return the response text."""
@@ -103,4 +104,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with sc.timer():
+        main()
