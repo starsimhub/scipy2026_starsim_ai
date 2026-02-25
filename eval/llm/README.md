@@ -1,5 +1,10 @@
 # Starsim Evaluation using `inspect_ai`
 
+## Quick start
+
+1. Install dependencies (`pip install -e .` or `uv sync`)
+2. Run `run.sh` to run all evaluations.
+
 ## Setup
 
 Install dependencies:
