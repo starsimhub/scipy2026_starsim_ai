@@ -2,7 +2,12 @@
 
 Evaluates the performance of LLMs for understanding and building Starsim models, with and without the Starsim-AI plugin.
 
-## Quick Start
+## Super quick start
+
+1. Run `./docker_up` (start the Claude A2A servers that run the evaluation)
+2. Run `./eval/agent/run.sh` (run the evaluation against different models + configurations)
+
+## Fairly quick Start
 
 The recommended way to run the Claude Code A2A server is with Docker, which provides filesystem isolation and a reproducible environment.
 
