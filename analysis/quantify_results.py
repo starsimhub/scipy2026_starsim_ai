@@ -33,6 +33,7 @@ for file in files:
 
     # Construct key: "{model}" or "{model}+plugin"
     key = shorten_model(entry.model)
+    key += log.eval.task_file
     if entry.plugin:
         key += ' + plugin'
 
@@ -48,6 +49,8 @@ for file in files:
     entry.score = log.results.scores[0].metrics['mean'].value
 
     # Store results
+    if key in r:
+        raise Exception('Already present')
     r[key] = entry
 
 df = sc.dataframe.from_dict(r, orient='index')
