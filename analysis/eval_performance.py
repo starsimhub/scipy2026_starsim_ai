@@ -1,51 +1,56 @@
-"""
-Evaluate performance of different models/configurations.
-"""
+# %%
+from rich import print
 
 import numpy as np
-import sciris as sc
-from rich import print
+import seaborn as sns
 import matplotlib.pyplot as plt
-from inspect_ai.analysis import evals_df
+from inspect_ai.analysis import evals_df, samples_df
 
 df_eval = evals_df('../logs')
+df_samples = samples_df('../logs')
 
-df_eval.head()
+# %%
 print(df_eval.columns)
+df_eval.head()
 print(f"df_eval.shape: {df_eval.shape}")
 
-# task_name = 'starsim_agent_benchmark'
-# df_task = df_eval[df_eval['task_name'] == task_name]
-df_task = df_eval # TODO: fix
+# %%
+task_names = df_eval['task_name'].unique()
+print(task_names)
+# %%
+# Figure 1: Pass rate vs. allowed time to solve per problem for agent benchmark
+task_name = 'starsim_agent_benchmark'
+df_task = df_eval[df_eval['task_name'] == task_name]
+df_task = df_task[np.logical_not(df_task['task_arg_with_background'])]
+df_task = df_task.sort_values(by='task_arg_request_timeout')
+df_task = df_task.rename(columns={'task_arg_agent_url': 'w/ Plugin', 'task_arg_request_timeout': 'Time limit'})
+df_task = df_task.replace({'w/ Plugin': {'http://localhost:9100': 'No', 'http://localhost:9101': 'Yes'}})
+
+fig = plt.figure(figsize=(5,3))
+ax = plt.gca()
+sns.barplot(x='Time limit', y='score_headline_value', data=df_task, ax=ax, hue='w/ Plugin')
+for container in ax.containers:
+    ax.bar_label(container, fontsize=10, fmt='%.2f');
+ax.set_ylim(0, 1)
+ax.set_xlabel('Allowed time to solve per problem (seconds)')
+ax.set_ylabel('Pass rate')
+ax.set_title('Starsim Agent Benchmark')
+
+# %%
+# Figure 2: Pass rate vs. model for LLM benchmark
+task_name = 'starsim_benchmark'
+df_task = df_eval[df_eval['task_name'] == task_name]
 df_task = df_task.sort_values(by='model')
 
-sc.options(dpi=150)
-fig = plt.figure(figsize=(8,8))
+fig = plt.figure(figsize=(5,3))
 ax = plt.gca()
-ax.barh(np.arange(len(df_task)), df_task['score_headline_value'], color='xkcd:lightblue')
-ax.set_yticks(np.arange(len(df_task)))
-ax.set_yticklabels(df_task['model'] + df_task['task_arg_with_plugin'].apply(str))
-ax.set_xlim(0, 1)
-ax.set_ylabel('Model')
-ax.set_xlabel('Pass rate')
+sns.barplot(x='model', y='score_headline_value', data=df_task, ax=ax, hue='task_arg_with_background')
+for container in ax.containers:
+    ax.bar_label(container, fontsize=10, fmt='%.2f');
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+ax.set_ylim(0, 1)
+ax.set_xlabel('Model')
+ax.set_ylabel('Pass rate')
 ax.set_title('Starsim LLM Benchmark')
 
-sc.figlayout()
-
-plt.show()
-
-
-# # Figure 1: Pass rate vs. allowed time to solve per problem
-# task_name = 'starsim_agent_benchmark'
-# df_task = df_eval[df_eval['task_name'] == task_name]
-# df_task = df_task.sort_values(by='task_arg_request_timeout')
-
-# fig = plt.figure(figsize=(5,3))
-# ax = plt.gca()
-# ax.bar(np.arange(len(df_task)),df_task['score_headline_value'], color='xkcd:blue')
-# ax.set_xticks(np.arange(len(df_task)))
-# ax.set_xticklabels(df_task['task_arg_request_timeout'])
-# ax.set_ylim(0, 1)
-# ax.set_xlabel('Allowed time to solve per problem (seconds)')
-# ax.set_ylabel('Pass rate')
-# ax.set_title('Starsim Agent Benchmark')
+# %%
