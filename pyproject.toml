@@ -1,7 +1,7 @@
 [project]
 name = "scipy2026-starsim-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Evaluating LLM agents on the Starsim disease modeling library"
 readme = "README.md"
 authors = [
     { name = "Katherine Rosenfeld", email = "info@starsim.org" },

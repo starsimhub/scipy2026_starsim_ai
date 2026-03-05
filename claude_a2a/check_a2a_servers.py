@@ -7,8 +7,8 @@ from non-plugin servers, for both Sonnet and Opus models.
 Queries all servers in parallel.
 
 Usage:
-    python eval/agent/check_a2a_servers.py
-    python eval/agent/check_a2a_servers.py --timeout 180
+    python claude_a2a/check_a2a_servers.py
+    python claude_a2a/check_a2a_servers.py --timeout 180
 """
 
 import argparse

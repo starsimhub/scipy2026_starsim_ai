@@ -5,7 +5,7 @@ from pathlib import Path
 
 import streamlit as st
 
-PROBLEMS_DIR = Path(__file__).parent / "problems"
+PROBLEMS_DIR = Path(__file__).parent
 
 PROBLEM_LABELS = {
     "starsim_t1": "Tutorial 1 — Introduction (Basic SIR/SIS Dynamics)",
