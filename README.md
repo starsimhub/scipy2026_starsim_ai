@@ -4,8 +4,9 @@ Evaluates the performance of LLMs for understanding and building Starsim models,
 
 ## *Super* quick start
 
-1. `./docker_up.sh` (start the Claude A2A servers that run the evaluation)
-2. `./run_eval.sh` (run the evaluation against different models + configurations)
+1. Install and set up `.env`
+2. `./docker_up.sh` (start the Claude A2A servers that run the evaluation)
+3. `./run_eval.sh` (run the evaluation against different models + configurations)
 
 ## Fairly quick Start
 
@@ -25,9 +26,11 @@ git submodule init && git submodule update
 
 ### 1. Set up the environment
 
+#### Environment variables
+
 You will need at least an Anthropic API key, and optionally also an OpenAI one for running the comparison. Set these via environment variable or a `.env` file (loaded automatically via `python-dotenv`). 
 
-If using `dotenv` (recommended), create the following `.env` file next to `docker-compose.yml` and add your API keys:
+If using `dotenv` (recommended), create the following `.env` file in the folder root (i.e., next to `docker-compose.yml`) and add your API keys:
 
 ```env
 ANTHROPIC_API_KEY=sk-...
@@ -38,7 +41,15 @@ MAX_TURNS=10
 LOG_DIR=/home/agent/agent_logs
 ```
 
-Only the Anthropic API key is strictly required, but the OpenAI key is also required for evaluation comparison. Other environment variables are optional.
+Only the Anthropic API key is strictly required, but the OpenAI key is also required for evaluation comparison. Other environment variables are optional and mostly for setting defaults.
+
+#### Installation
+
+You can install either via `pip` or via `uv`:
+- For pip: `pip install -e .`
+- For uv: `uv sync`
+
+You also need to have Docker installed, but the chances that you're reading this sentence and don't already have it installed seem pretty slim.
 
 ### 2. Start the A2A server
 
