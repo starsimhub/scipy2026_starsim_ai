@@ -2,7 +2,7 @@
 FastMCP server that exposes a single "get_secret" tool.
 
 Run standalone:
-    python -m sandbagging_workshop.mcp_secret
+    python -m claude_a2a.mcp_secret
 """
 
 from __future__ import annotations

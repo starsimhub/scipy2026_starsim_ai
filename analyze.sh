@@ -1,5 +1,5 @@
 #!/bin/bash
 # Run analysis after evaluation has been run
-# NB: only uv run works, running the script directly does not for some reason
+# NB: best to use uv since fragile dependency issues otherwise
 
 cd analysis && uv run eval_performance.py

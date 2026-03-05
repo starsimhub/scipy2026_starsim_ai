@@ -6,7 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
-AGENT_LOGS_DIR = Path(__file__).parent.parent / "agent_logs"
+AGENT_LOGS_DIR = Path(__file__).parent.parent.parent / "agent_logs"
 
 
 @st.cache_data

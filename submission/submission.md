@@ -7,11 +7,12 @@ Cliff Kerr¹, Katherine Rosenfeld¹, Jessica Lundin¹, Robyn Stuart¹, Romesh Ab
 2 March 2026
 
  
-# **Abstract ("around 100 words or less")**
+## **Abstract ("around 100 words or less")**
 
 Scientists apply rigorous methods to their research, but rarely to the AI tools they use to write code. We tested different LLM models in combination with domain-specific tools (including MCP servers and skills) to find the optimal combination for writing complex domain-specific code. We created a quantitative proficiency test for Starsim, a disease modeling framework, and evaluated different combinations of models and tools. While Claude Opus outperformed other models, access to tools improved performance more than choosing the best model. Thus, to improve LLM performance on domain-specific problems, we recommend developing a set of tools with the help of quantitative evaluation.
 
-# **Description ("roughly 500 words")**
+
+## **Description ("roughly 500 words")**
 
 **Background**  
 Scientists are often decidedly unscientific about choosing AI tools to help them write code. They know these tools are helpful, but except for trying out different models, they rarely perform controlled evaluations to check whether other changes to their AI workflow produce significantly better results. This is because writing and executing these evaluations is typically time-consuming, the results of the evaluations are difficult to interpret and quantify, and AI workflows and tooling are evolving rapidly. Here we describe our process for quantitatively testing our assumptions about how to build a good AI assistant.
@@ -31,7 +32,8 @@ Performance on the evaluation varied widely among the no-tool models, from 17% w
 **Conclusions**  
 For our domain-specific problem, providing custom skills and MCP servers reduced the error rate by a factor of three (from 30% to 9%) and reduced task completion time by 20%. We recommend creating a structured problem set for use with a quantitative evaluation tool, as this can help develop the set of domain-specific tools that most effectively improves LLM performance.
 
-# **Notes to organizer**
+
+## **Notes to organizer**
 
 I gave a [talk at SciPy 2022](https://www.youtube.com/watch?v=eZJ0FaPw2Gs) in Austin on [Covasim](https://conference.scipy.org/proceedings/scipy2022/pdfs/cliff_kerr.pdf), a COVID-19 model. I also gave a [talk at SciPy 2024](https://www.youtube.com/watch?v=3uMTnn8xC8w) on [Starsim](https://starsim.org/), and a lightning talk on [Sciris](https://sciris.org).
 

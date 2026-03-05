@@ -29,7 +29,7 @@ inspect eval eval/prompt/starsim.py --model anthropic/claude-sonnet-4-6 --temper
 inspect eval eval/agent/starsim.py -T model=sonnet
 
 # Browse problems interactively
-uv run streamlit run app.py
+uv run streamlit run problems/app.py
 ```
 
 ## Project Structure
@@ -42,11 +42,13 @@ uv run streamlit run app.py
   - `prompt/starsim.py` — One-shot prompt evaluation (inspect-ai)
   - `agent/starsim.py` — Iterative agent evaluation via A2A server
   - `shared.py` — Shared evaluation utilities
-- `problems/` — Problem definitions
+- `problems/` — Problem definitions and Streamlit browser
   - `starsim_t*.md` — Source of truth (Markdown)
   - `starsim_t*.jsonl` — Generated from Markdown via `build_jsonl.py`
+  - `app.py` — Streamlit problem browser
+- `analysis/` — Post-evaluation analysis scripts and plotting
 - `tests/` — pytest test suite
-- `app.py` — Streamlit problem browser
+- `starsim_ai/` — Git submodule: Starsim AI plugin
 - `Dockerfile` / `docker-compose.yml` — Containerized A2A server
 
 ## Conventions
