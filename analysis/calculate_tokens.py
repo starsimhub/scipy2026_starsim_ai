@@ -24,10 +24,12 @@ print(df)
 print('Extra token usage')
 tk = sc.objdict()
 
-tk.sonnet0 = r[2].tokens
-tk.sonnet1 = r[1].tokens
-tk.opus0 = r[0].tokens
-tk.opus1 = r[3].tokens
+keys = list(r.keys())
+agent_keys = {k: r[k] for k in keys if 'agent' in k}
+tk.sonnet0 = [v.tokens for k, v in agent_keys.items() if 'sonnet' in k and 'plugin' not in k][0]
+tk.sonnet1 = [v.tokens for k, v in agent_keys.items() if 'sonnet' in k and 'plugin' in k][0]
+tk.opus0   = [v.tokens for k, v in agent_keys.items() if 'opus' in k and 'plugin' not in k][0]
+tk.opus1   = [v.tokens for k, v in agent_keys.items() if 'opus' in k and 'plugin' in k][0]
 
 sonnet = ((tk.sonnet1/tk.sonnet0) - 1)*100
 opus = ((tk.opus1/tk.opus0) - 1)*100

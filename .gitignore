@@ -211,3 +211,7 @@ logs/
 agent_logs/
 attic_logs/
 *.eval
+
+# Analysis artifacts
+*.orig
+engineering_score.md
