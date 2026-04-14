@@ -107,6 +107,14 @@ def run_tests(
     return passed, total, errors
 
 
+def format_test_cases(test_cases: list[dict]) -> str:
+    """Format test cases for inclusion in a prompt."""
+    parts = []
+    for tc in test_cases:
+        parts.append(f"### {tc['description']}\n```python\n{tc['test']}\n```")
+    return "\n\n".join(parts)
+
+
 @metric
 def sub_step_accuracy() -> Metric:
     """Fraction of individual sub-steps where all tests pass."""

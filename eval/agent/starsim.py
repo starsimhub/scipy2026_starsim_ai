@@ -55,6 +55,7 @@ from inspect_ai.solver import Generate, TaskState, solver
 
 from eval.shared import (
     extract_python_code,
+    format_test_cases,
     load_problems,
     run_tests,
     sub_step_accuracy,
@@ -115,14 +116,6 @@ AGENT_PROMPT_TEMPLATE = textwrap.dedent("""\
     Include any necessary import statements inside the function body.
     DO NOT include any explanations, comments, or text outside the code block.
 """)
-
-
-def _format_test_cases(test_cases: list[dict]) -> str:
-    """Format test cases for inclusion in the agent prompt."""
-    parts = []
-    for tc in test_cases:
-        parts.append(f"### {tc['description']}\n```python\n{tc['test']}\n```")
-    return "\n\n".join(parts)
 
 
 def _make_a2a_request(text: str) -> dict:
@@ -205,7 +198,7 @@ def a2a_agent_solver(
         test_cases_section = (
             "## Test Cases\nThe following test cases will be used to verify your solution.\n"
             "You can use these to test your implementation:\n\n"
-            + _format_test_cases(meta["test_cases"])
+            + format_test_cases(meta["test_cases"])
             if with_test_cases
             else ""
         )

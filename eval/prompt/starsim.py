@@ -44,6 +44,7 @@ from inspect_ai.solver import Generate, TaskState, solver
 
 from eval.shared import (
     extract_python_code,
+    format_test_cases,
     load_problems,
     run_tests,
     sub_step_accuracy,
@@ -76,14 +77,6 @@ PROMPT_TEMPLATE = textwrap.dedent("""\
 """)
 
 
-def _format_test_cases(test_cases: list[dict]) -> str:
-    """Format test cases for inclusion in the prompt."""
-    parts = []
-    for tc in test_cases:
-        parts.append(f"### {tc['description']}\n```python\n{tc['test']}\n```")
-    return "\n\n".join(parts)
-
-
 @solver
 def starsim_solver(with_background: bool = True, with_test_cases: bool = False):
     async def solve(state: TaskState, generate: Generate) -> TaskState:
@@ -94,7 +87,7 @@ def starsim_solver(with_background: bool = True, with_test_cases: bool = False):
         )
         test_cases_section = (
             "## Test Cases\nThe following test cases will be used to verify your solution:\n\n"
-            + _format_test_cases(meta["test_cases"])
+            + format_test_cases(meta["test_cases"])
             if with_test_cases
             else ""
         )
