@@ -26,6 +26,7 @@ def load_problems() -> list[dict]:
 
 
 def main():
+    """Launch the Streamlit app for browsing the Starsim evaluation dataset."""
     st.set_page_config(page_title="Starsim Eval Browser", layout="wide")
     st.title("Starsim AI Evaluation Dataset")
 
