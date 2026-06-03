@@ -35,6 +35,15 @@ logging.basicConfig(
 # ---------------------------------------------------------------------------
 
 def build_agent_card(host: str, port: int) -> AgentCard:
+    """Build an A2A AgentCard describing this server's capabilities.
+
+    Args:
+        host: Hostname or IP the server is listening on.
+        port: Port number the server is listening on.
+
+    Returns:
+        An AgentCard populated with the server's URL, skills, and capabilities.
+    """
     return AgentCard(
         name="Claude Code Agent",
         description=(
