@@ -1,6 +1,6 @@
 # Agentic evaluation
 
-Tests the performance of Claude models ith different configurations (with/without plugins) using an agent-to-agent (A2A) architecture. Agents are tasked with writing, testing, and debugging Starsim code.
+Tests the performance of Claude models with different configurations (with/without plugins) using an agent-to-agent (A2A) architecture. Agents are tasked with writing, testing, and debugging Starsim code.
 
 ## Files
 

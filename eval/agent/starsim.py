@@ -352,8 +352,10 @@ def starsim_agent_benchmark(
     """Starsim agent coding evaluation benchmark.
 
     Sends problems to a Claude Code A2A server and evaluates the
-    generated code against test cases. The agent_url is determined
-    automatically from model and with_plugin.
+    generated code against test cases. Unlike the one-shot prompt benchmark,
+    the agent can iteratively write, test, and debug code. The agent URL is
+    determined automatically from *model* and *with_plugin* (see
+    ``AGENT_PORTS``).
 
     Args:
         model: Agent model name — "sonnet" or "opus".
@@ -365,6 +367,21 @@ def starsim_agent_benchmark(
         request_timeout: HTTP timeout in seconds for agent requests.
         max_retries: Max retries on HTTP timeout (default: 1).
         with_plugin: Use plugin server and tag trial name.
+
+    Returns:
+        An inspect_ai ``Task`` that drives the A2A agent over the problem set.
+
+    Example:
+        Start the matching A2A server first, then run the benchmark:
+
+        ```bash
+        docker compose up --build sonnet
+        inspect eval eval/agent/starsim.py -T model=sonnet -T tutorial=starsim_t1
+        ```
+
+    See Also:
+        [`starsim_benchmark`][eval.prompt.starsim.starsim_benchmark]:
+            the one-shot (non-agent) variant of this benchmark.
     """
     agent_url = _get_agent_url(model, with_plugin)
 

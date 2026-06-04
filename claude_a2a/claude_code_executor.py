@@ -169,12 +169,36 @@ class ClaudeCodeConfig:
                          unattended A2A operation.
         model:           Model to use (None = SDK default).
         max_turns:       Max agent loop iterations per request.
+        mcp_servers:     Names of MCP servers (from ``MCP_REGISTRY``) to attach.
         plugin_dirs:     Directories containing Claude Code plugins to load.
         verbose:         Print detailed execution progress to stdout.
         log_dir:         Directory for structured JSONL execution logs.
                          One file per task. None = logging disabled.
         run_id:          Label for this server run (used as subdirectory
                          under log_dir). Defaults to an ISO-8601 timestamp.
+
+    Example:
+        Configure a plugin-enabled, logging server and hand it to an executor:
+
+        ```python
+        from claude_a2a.claude_code_executor import (
+            ClaudeCodeConfig,
+            ClaudeCodeExecutor,
+        )
+
+        config = ClaudeCodeConfig(
+            model="claude-opus-4-6",
+            max_turns=10,
+            plugin_dirs=["./starsim_ai"],
+            log_dir="./agent_logs",
+            verbose=True,
+        )
+        executor = ClaudeCodeExecutor(config=config)
+        ```
+
+    See Also:
+        [`ClaudeCodeExecutor`][claude_a2a.claude_code_executor.ClaudeCodeExecutor]:
+            the A2A executor that consumes this configuration.
     """
 
     def __init__(
@@ -256,6 +280,33 @@ class ClaudeCodeExecutor(AgentExecutor):
       5. Emit the final answer as a TaskArtifactUpdateEvent.
       6. Track the Claude session ID so subsequent messages on the
          same A2A task resume the conversation.
+
+    Example:
+        Wire the executor into an A2A Starlette application (this is what
+        ``claude_code_server.main`` does under the hood):
+
+        ```python
+        from a2a.server.apps import A2AStarletteApplication
+        from a2a.server.request_handlers import DefaultRequestHandler
+        from a2a.server.tasks import InMemoryTaskStore
+        from claude_a2a.claude_code_executor import (
+            ClaudeCodeConfig,
+            ClaudeCodeExecutor,
+        )
+
+        executor = ClaudeCodeExecutor(ClaudeCodeConfig(model="claude-sonnet-4-6"))
+        handler = DefaultRequestHandler(
+            agent_executor=executor,
+            task_store=InMemoryTaskStore(),
+        )
+        # app = A2AStarletteApplication(agent_card=..., http_handler=handler)
+        ```
+
+    See Also:
+        [`ClaudeCodeConfig`][claude_a2a.claude_code_executor.ClaudeCodeConfig]:
+            the configuration this executor consumes.
+        [`build_agent_card`][claude_a2a.claude_code_server.build_agent_card]:
+            builds the AgentCard served alongside this executor.
     """
 
     def __init__(self, config: ClaudeCodeConfig | None = None):
