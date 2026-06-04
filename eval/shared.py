@@ -35,7 +35,33 @@ def extract_python_code(response: str) -> str:
 
 
 def load_problems(problems_dir: str, tutorial: str | None = None) -> list[Sample]:
-    """Load problem JSONL files and convert to inspect_ai Samples."""
+    """Load problem JSONL files and convert them to inspect_ai Samples.
+
+    Reads every ``starsim_t*.jsonl`` file in *problems_dir* and turns each
+    sub-step record into an inspect_ai ``Sample`` whose ``metadata`` holds the
+    full problem definition (description, function header, test cases, etc.).
+
+    Args:
+        problems_dir: Directory containing the generated ``starsim_t*.jsonl`` files.
+        tutorial: Optional problem ID (e.g. ``"starsim_t1"``) to load a single
+            tutorial. When ``None``, all tutorials are loaded.
+
+    Returns:
+        A list of samples ready to wrap in a ``MemoryDataset``.
+
+    Example:
+        ```python
+        from inspect_ai.dataset import MemoryDataset
+        from eval.shared import load_problems
+
+        samples = load_problems("./problems", tutorial="starsim_t1")
+        dataset = MemoryDataset(samples=samples, name="starsim")
+        ```
+
+    See Also:
+        [`run_tests`][eval.shared.run_tests]: scores a solution against a
+        sample's ``test_cases`` metadata.
+    """
     problems_path = Path(problems_dir)
     samples = []
     for jsonl_file in sorted(problems_path.glob("starsim_t*.jsonl")):
@@ -73,7 +99,42 @@ def run_tests(
     dependencies: list[str],
     timeout: int,
 ) -> tuple[int, int, list[str]]:
-    """Run test cases against generated code. Returns (passed, total, errors)."""
+    """Run test cases against generated code.
+
+    Each test case is concatenated with a dependency import preamble and the
+    candidate *code*, then executed in its own subprocess. A case passes if the
+    subprocess exits cleanly within *timeout* seconds.
+
+    Args:
+        code: The candidate solution (typically a single function definition).
+        test_cases: Test-case dicts, each with ``"test"`` (code) and
+            ``"description"`` keys.
+        dependencies: Package names (e.g. ``["starsim", "numpy"]``) used to
+            build the import preamble prepended to every test.
+        timeout: Per-test-case wall-clock limit, in seconds.
+
+    Returns:
+        A ``(passed, total, errors)`` tuple: the number of cases that passed,
+        the total number of cases, and a list of failure/timeout messages.
+
+    Example:
+        ```python
+        from eval.shared import load_problems, run_tests
+
+        problem = load_problems("./problems", tutorial="starsim_t1")[0].metadata
+        passed, total, errors = run_tests(
+            code=problem["gold_solution"],
+            test_cases=problem["test_cases"],
+            dependencies=problem["dependencies"],
+            timeout=60,
+        )
+        assert passed == total, errors
+        ```
+
+    See Also:
+        [`load_problems`][eval.shared.load_problems]: supplies the test cases
+        and dependencies for a problem.
+    """
     preamble = make_preamble(dependencies)
     passed = 0
     total = len(test_cases)

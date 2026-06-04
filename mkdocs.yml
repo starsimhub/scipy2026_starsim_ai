@@ -1,0 +1,68 @@
+site_name: SciPy 2026 — Starsim AI Evaluation
+site_description: Evaluating how well AI agents can use the Starsim disease modeling library
+site_url: https://starsimhub.github.io/scipy2026_starsim_ai/
+repo_url: https://github.com/starsimhub/scipy2026_starsim_ai
+repo_name: starsimhub/scipy2026_starsim_ai
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            separate_signature: true
+            merge_init_into_class: true
+            docstring_section_style: table
+
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Evaluation dataset: evaluation.md
+  - Architecture: architecture.md
+  - Execution logging: execution-logging.md
+  - API reference:
+      - claude_a2a: reference/claude_a2a.md
+      - eval: reference/eval.md

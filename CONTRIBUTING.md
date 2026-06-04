@@ -51,6 +51,31 @@ Problem definitions live in Markdown files (`problems/starsim_t*.md`). The JSONL
    ```
 
 
+## Documentation
+
+The documentation site is built with [MkDocs](https://www.mkdocs.org/) +
+[Material](https://squidfunk.github.io/mkdocs-material/), with API reference
+auto-generated from docstrings via
+[mkdocstrings](https://mkdocstrings.github.io/). Source lives in `docs/`.
+
+```bash
+# Install the docs dependency group
+uv sync --group docs
+
+# Live preview at http://127.0.0.1:8000
+uv run mkdocs serve
+
+# Build the static site (the same check CI runs)
+uv run mkdocs build --strict
+```
+
+Pushes to `main` deploy the site to GitHub Pages via
+`.github/workflows/docs.yml`. When you add or change public classes/functions,
+write [Google-style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
+with an `Example:` section so they render well in the API reference. Also update
+`CHANGELOG.md` under the `## [Unreleased]` heading.
+
+
 ## Submitting changes
 
 1. Create a feature branch from `main`.

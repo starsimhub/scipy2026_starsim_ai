@@ -141,12 +141,41 @@ def starsim_benchmark(
 ) -> Task:
     """Starsim coding evaluation benchmark.
 
+    A one-shot benchmark: the model sees a problem description and function
+    signature and must return a complete implementation in a single attempt.
+
     Args:
         problems_dir: Path to directory containing problem JSONL files.
         tutorial: Optional tutorial ID to filter (e.g. "starsim_t1").
         with_background: Whether to include background context in prompts.
         with_test_cases: Whether to include test cases in prompts.
         timeout: Timeout in seconds for each test case execution.
+
+    Returns:
+        An inspect_ai ``Task`` pairing the problem dataset with the Starsim
+        solver and scorer.
+
+    Example:
+        From the command line:
+
+        ```bash
+        inspect eval eval/prompt/starsim.py \\
+            --model anthropic/claude-sonnet-4-6 -T tutorial=starsim_t1
+        ```
+
+        Or programmatically:
+
+        ```python
+        from inspect_ai import eval
+        from eval.prompt.starsim import starsim_benchmark
+
+        eval(starsim_benchmark(tutorial="starsim_t1"),
+             model="anthropic/claude-sonnet-4-6")
+        ```
+
+    See Also:
+        [`starsim_agent_benchmark`][eval.agent.starsim.starsim_agent_benchmark]:
+            the iterative agent variant of this benchmark.
     """
     samples = load_problems(problems_dir, tutorial)
     dataset = MemoryDataset(samples=samples, name="starsim")

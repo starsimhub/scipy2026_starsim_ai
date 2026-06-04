@@ -30,6 +30,9 @@ inspect eval eval/agent/starsim.py -T model=sonnet
 
 # Browse problems interactively
 uv run streamlit run problems/app.py
+
+# Preview the documentation site (install with: uv sync --group docs)
+uv run mkdocs serve
 ```
 
 ## Project Structure
@@ -47,6 +50,7 @@ uv run streamlit run problems/app.py
   - `starsim_t*.jsonl` — Generated from Markdown via `build_jsonl.py`
   - `app.py` — Streamlit problem browser
 - `analysis/` — Post-evaluation analysis scripts and plotting
+- `docs/` — MkDocs documentation site (tutorial, explanation, API reference); built via `mkdocs.yml`
 - `tests/` — pytest test suite
 - `starsim_ai/` — Git submodule: Starsim AI plugin
 - `Dockerfile` / `docker-compose.yml` — Containerized A2A server

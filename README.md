@@ -1,6 +1,24 @@
 # SciPy 2026: Starsim AI Evaluation
 
-Evaluates the performance of LLMs for understanding and building Starsim models, with and without the Starsim-AI plugin.
+**How well can AI coding agents use a real scientific library?** This [SciPy 2026](https://www.scipy2026.scipy.org/) project measures that for [Starsim](https://github.com/starsimhub/starsim), an agent-based disease modeling library used to inform public health and epidemic-response decisions. Disease-modeling expertise is scarce — especially in the low- and middle-income countries where outbreaks hit hardest — so agents that can build correct, idiomatic Starsim models could meaningfully lower the barrier to rigorous epidemiological analysis.
+
+This repository evaluates the performance of LLMs (Claude Sonnet and Opus) for understanding and building Starsim models, with and without the [Starsim AI plugin](https://github.com/starsimhub/starsim_ai). It scores agents not just on whether their code runs, but on whether it genuinely *uses Starsim as a library* rather than reinventing it.
+
+📖 **Full documentation:** <https://starsimhub.github.io/scipy2026_starsim_ai/>
+
+
+## Documentation
+
+| Page | What it covers |
+|------|----------------|
+| [Getting started](docs/getting-started.md) | Step-by-step: install, start a server, run your first problem. |
+| [Evaluation dataset](docs/evaluation.md) | What the benchmark measures, problem structure, scoring, and modes. |
+| [Architecture](docs/architecture.md) | How the A2A server and executor are built. |
+| [Execution logging](docs/execution-logging.md) | Structured JSONL logs and how to read them. |
+| [Changelog](CHANGELOG.md) | Notable changes to the project. |
+| [Contributing](CONTRIBUTING.md) | Dev setup, tests, problem-editing workflow, PR process. |
+
+These pages also render as a searchable site with a full API reference at **[starsimhub.github.io/scipy2026_starsim_ai](https://starsimhub.github.io/scipy2026_starsim_ai/)**.
 
 
 ## Quick start
@@ -8,6 +26,8 @@ Evaluates the performance of LLMs for understanding and building Starsim models,
 1. Install packages and set up `.env`
 2. `./docker_up.sh` (start the Claude A2A servers that run the evaluation)
 3. `./run_eval.sh` (run the evaluation against different models + configurations)
+
+New to the project? Follow the [Getting started tutorial](docs/getting-started.md) for a guided walkthrough.
 
 
 ## Full setup
@@ -117,10 +137,12 @@ Server CLI options:
 | `--log-dir` | — | Directory for structured JSONL execution logs (one file per task) |
 | `--run-id` | ISO-8601 timestamp | Label for this server run (subdirectory under `--log-dir`) |
 
+See [Architecture](docs/architecture.md) for how the server and executor work, and [Execution logging](docs/execution-logging.md) for the log format.
+
 
 ## Running the evaluation
 
-The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure performance on the Starsim problem set. See [`eval/prompt/README.md`](eval/prompt/README.md) for the full list of options.
+The evaluation benchmark uses [inspect-ai](https://inspect.ai-safety-institute.org.uk/) to measure performance on the Starsim problem set. See [`eval/prompt/README.md`](eval/prompt/README.md) for the full list of options, and [Evaluation dataset](docs/evaluation.md) for what the benchmark measures and how it's scored.
 
 ### Agent evaluation (iterative)
 
@@ -184,99 +206,24 @@ uv run python -i analysis/eval_performance.py
 
 ## Evaluation dataset
 
-Our evaluation benchmark follows the structure of [SciCode](https://arxiv.org/abs/2407.13168), adapted for disease modeling with [Starsim](https://github.com/starsimhub/starsim). A central goal of this benchmark is to measure how well an agent can **leverage Starsim as a library** to solve modeling problems, rather than writing disease models from scratch. Agents that effectively use Starsim's built-in components (e.g., `ss.SIR`, `ss.Vaccine`, contact networks) demonstrate the kind of library fluency that matters in practice. Furthermore, we add a time limit on the agent evaluation to assess the time required to find a solution (or not!).
+Our benchmark follows the structure of [SciCode](https://arxiv.org/abs/2407.13168), adapted for disease modeling with Starsim. It rewards agents that can **leverage Starsim as a library** — not just produce correct numerical output — using an LLM-judge assessment alongside test-case validation.
 
-To assess this, we depart from SciCode in one key way: in addition to test-case validation, we use an **LLM-judge assessment** to evaluate whether the agent's solution actually uses Starsim APIs. This catches cases where an agent produces numerically correct output but bypasses Starsim entirely (e.g., by implementing ODE solvers from scratch). The judge reviews the generated code and scores it on Starsim API usage, idiomatic patterns, and appropriate use of library abstractions.
-
-### Browse the evaluation dataset
-
-A Streamlit app lets you browse the evaluation problems interactively:
+Browse the problems interactively:
 
 ```bash
 uv run streamlit run problems/app.py
 ```
 
-### Problem structure
-
-Each problem is a multi-step disease modeling task. The **source of truth** is a set of human-readable Markdown files (`problems/starsim_t*.md`). These are converted to JSONL (`problems/starsim_t*.jsonl`) for consumption by the evaluation harness.
-
-**Editing problems:** Edit the `.md` files, then regenerate the JSONL:
+Edit problems in the Markdown sources (`problems/starsim_t*.md`), then regenerate the JSONL:
 
 ```bash
 python3 problems/build_jsonl.py
 ```
 
-A test (`test_jsonl_matches_markdown`) ensures the JSONL files stay in sync with the Markdown sources — if you edit a `.md` file without regenerating, `uv run pytest tests/test_problems.py` will fail.
-
-Problems are organized hierarchically:
-
-**Main Problem** — A complete modeling task (e.g., "Build an SIR model with age-stratified mixing and calibrate to observed data").
-
-Each main problem decomposes into sequential **subproblems**, where later steps can depend on outputs from earlier ones.
-
-#### Fields per subproblem
-
-| Field | Description |
-|---|---|
-| `problem_id` | Unique identifier for the main problem (e.g., `"starsim_01"`) |
-| `sub_step_id` | Identifier for the subproblem (e.g., `"starsim_01.3"`) |
-| `description` | Natural language description of the task |
-| `function_header` | Python function signature to implement |
-| `docstring` | Input/output specification |
-| `background` | Optional domain context (epidemiology concepts, model equations, parameter definitions) |
-| `dependencies` | Allowed Python packages (e.g., `starsim`, `numpy`, `scipy`, `matplotlib`) |
-| `test_cases` | Input-output pairs and domain-specific validations |
-| `gold_solution` | Reference implementation |
-
-#### Example problem outline
-```sh
-Problem: starsim_01 — "SIR model with vaccination campaign"
-  ├── Sub 1: Define disease parameters and create an SIR model
-  ├── Sub 2: Add age-stratified contact network
-  ├── Sub 3: Implement a time-varying vaccination intervention
-  ├── Sub 4: Run the simulation and extract results
-  └── Sub 5: Plot epidemic curves and compute final size
-```
-
-### Evaluation modes
-
-Following SciCode, we support multiple evaluation configurations:
-
-| Mode | Background provided? | Prior solutions | Tests |
-|---|---|---|---|
-| **Standard** | No | Model-generated | Measures real-world capability |
-| **With background** | Yes | Model-generated | Measures instruction-following |
-| **Gold prior** | No | Gold solutions | Isolates per-step capability |
-| **With background + gold prior** | Yes | Gold solutions | Easiest setting |
-
-### Evaluation criteria
-
-Each solution is assessed on two axes:
-
-1. **Correctness** — Does the solution pass the test cases? (Same as SciCode.)
-2. **Starsim utilization** — Does the solution use Starsim effectively? An LLM judge reviews the generated code and scores it on:
-   - Whether core Starsim APIs are used (e.g., `ss.Sim`, `ss.SIR`, `ss.Network`)
-   - Whether library abstractions are used appropriately (e.g., using `ss.Vaccine` instead of manually modifying susceptibility)
-   - Whether the code follows idiomatic Starsim patterns
-
-A solution that passes all test cases but doesn't use Starsim would score high on correctness but low on utilization. The benchmark is designed to reward agents that can learn and apply a domain library, not just produce correct numerical output.
-
-### Problem domains
-
-Problems span core Starsim use cases:
-
-- **Basic modeling** — SIR/SIS/SEIR dynamics, parameter configuration
-- **Demographics** — Birth/death processes, age structure, population networks
-- **Interventions** — Vaccination campaigns, treatment protocols, behavioral changes
-- **Calibration** — Fitting models to observed data, likelihood-based calibration
-- **Analysis** — Result extraction, plotting, sensitivity analysis
-- **Multi-disease** — Co-circulating pathogens, disease interactions
-- **Advanced networks** — Household structure, spatial mixing, dynamic contact patterns
+👉 See [**Evaluation dataset**](docs/evaluation.md) for the full picture: problem structure and fields, the SciCode-derived evaluation modes, scoring criteria, and the problem domains covered.
 
 
-## Architecture
-
-### Project structure
+## Project structure
 
 | Directory | Purpose |
 |-----------|---------|
@@ -288,68 +235,7 @@ Problems span core Starsim use cases:
 | `starsim_ai/` | Git submodule: [Starsim AI plugin](https://github.com/starsimhub/starsim_ai) (mounted into Docker for plugin-enabled agents) |
 | `logs/` | Evaluation run logs (`.eval` files, gitignored) |
 
-### Claude Code A2A Server
-
-The project includes an [A2A](https://google.github.io/A2A/) (Agent-to-Agent) server that exposes Claude Code as a discoverable, callable coding agent over HTTP.
-
-**Server** (`claude_a2a/claude_code_server.py`): Builds an Agent Card advertising four skills — code generation, code review & bug fixing, shell & DevOps, and research & exploration — and serves it via a Starlette/Uvicorn application.
-
-**Executor** (`claude_a2a/claude_code_executor.py`): Bridges the A2A protocol to Claude Code via the Claude Agent SDK. Key behaviors:
-
-- **Workspace isolation** — each A2A task gets its own workspace directory for file operations.
-- **Multi-turn sessions** — tracks Claude Agent SDK session IDs per task so follow-up messages resume the same conversation context.
-- **Streaming progress** — emits intermediate `TaskStatusUpdateEvent`s as Claude works, including text output and tool-use notifications.
-- **Cancellation** — supports async cancellation via `asyncio.Event`.
-- **Configurable tools** — defaults to Read, Write, Edit, MultiEdit, Bash, Glob, Grep, and WebSearch; runs with `bypassPermissions` mode.
-- **MCP extensibility** — pluggable MCP servers for domain-specific capabilities (an example "secret" server is included in `claude_a2a/mcp_secret.py`).
-- **Plugin support** — load Claude Code plugins via `--plugin-dir` (or `PLUGIN_DIRS` env var). The plugin-enabled Docker services use this to mount the Starsim plugin from the `starsim_ai` submodule.
-- **Execution logging** — optional structured JSONL logs capturing prompts, tool usage, assistant responses, and errors for each task.
-
-### Execution Logging
-
-When `--log-dir` is set (or `LOG_DIR` in Docker), the executor writes one JSONL file per task, organized by server run:
-
-```
-agent_logs/
-├── 20260221T153000Z/      # first eval run
-│   ├── <task_id_1>.jsonl
-│   └── <task_id_2>.jsonl
-└── 20260221T170000Z/      # second eval run
-    ├── <task_id_3>.jsonl
-    └── <task_id_4>.jsonl
-```
-
-Each server start creates a new timestamped subdirectory. You can also pass `--run-id` (or `RUN_ID` env var) to label runs explicitly (e.g. `--run-id baseline-sonnet`).
-
-Each line is a self-contained JSON object. All events include `ts` (Unix timestamp), `run_id`, and `event` fields.
-
-**Events logged:**
-
-| Event | Fields | Description |
-|-------|--------|-------------|
-| `task_start` | `prompt`, `workspace`, `model` | The problem sent to Claude and execution context |
-| `assistant_text` | `text` | Each text block Claude produces |
-| `tool_use` | `tool`, `input` | Tool name and input summary |
-| `result` | `session_id` | Session ID for multi-turn tracking |
-| `error` | `error` | Exception details on failure |
-| `task_complete` | `response_len` | Final response length |
-
-**Docker log access:**
-
-```bash
-# Copy logs from a service
-docker compose cp sonnet:/home/agent/agent_logs ./sonnet_logs
-docker compose cp sonnet-plugin:/home/agent/agent_logs ./sonnet_plugin_logs
-
-# List runs
-docker compose exec sonnet ls /home/agent/agent_logs/
-
-# Label a run explicitly
-RUN_ID=baseline-sonnet docker compose up --build
-
-# Disable logging
-LOG_DIR= docker compose up --build
-```
+For the design of the A2A server and executor, see [**Architecture**](docs/architecture.md).
 
 
 ## Running tests
