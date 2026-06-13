@@ -129,19 +129,15 @@ models, task performance was strongly correlated with token usage
 correlation, and/or bar chart comparing models. Replace figure1.png and
 figure2.png with actual result figures.] -->
 
-:::{figure} figure1.png
+<!-- :::{figure} figure1.png
 :label: fig:results
-<!-- [PLACEHOLDER: replace with actual results figure — e.g., bar chart of
-scores by model/condition.] -->
 Placeholder figure: evaluation scores by model and tool condition.
 :::
 
 :::{figure} figure2.png
 :label: fig:tokens
-<!-- [PLACEHOLDER: replace with actual figure — e.g., scatter plot of
-performance vs. token usage (R²=0.61).] -->
 Placeholder figure: task performance vs. token usage across models.
-:::
+::: -->
 
 ## Discussion
 
