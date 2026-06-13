@@ -4,43 +4,57 @@ project:
   # Update this to match `scipy-2026-<folder>` the folder should be `<firstname_surname>`
   id: scipy-2026-cliff_kerr
   # Ensure your title is the same as in your `main.md`
-  title: A Numerical Perspective to Terraforming a Desert
+  title: "Vibes, meet rigor: Evaluating and improving AI performance on complex scientific code"
   # subtitle:
-  description: Add a two sentence description about your article.
+  description: >-
+    We quantitatively evaluated LLM models with and without domain-specific
+    tools (MCP servers and skills) on a Starsim disease modeling benchmark,
+    finding that tool access improved performance more than model choice alone.
   # Authors should have affiliations, emails and ORCIDs if available
   authors:
-    - name: Ada Lovelace
-      email: ada.lovelace@example.org
-      orcid: 0000-0000-0000-0000
+    - name: Cliff Kerr
+      email: cliff.kerr@gatesfoundation.org
+      # orcid: [PLACEHOLDER: add ORCID if available]
       affiliations:
-        - Analytical Society, London
-    - name: Chien-Shiung Wu
-      email: cs.wu@example.org
-      affiliations:
-        - Columbia University
-    - name: Katherine Johnson
-      email: k.johnson@example.org
-      affiliations:
-        - NASA Langley Research Center
+        - Bill & Melinda Gates Foundation, Seattle, USA
       corresponding: true
-    - name: Alan Turing
-      email: alan.turing@example.org
+    - name: Katherine Rosenfeld
+      email: katherine.rosenfeld@gatesfoundation.org  # [PLACEHOLDER: confirm email]
       affiliations:
-        - University of Manchester
+        - Bill & Melinda Gates Foundation, Seattle, USA
+    - name: Jessica Lundin
+      email: jessica.lundin@gatesfoundation.org  # [PLACEHOLDER: confirm email]
+      affiliations:
+        - Bill & Melinda Gates Foundation, Seattle, USA
+    - name: Robyn Stuart
+      email: robyn.stuart@gatesfoundation.org  # [PLACEHOLDER: confirm email]
+      affiliations:
+        - Bill & Melinda Gates Foundation, Seattle, USA
+    - name: Romesh Abeysuriya
+      # email: [PLACEHOLDER: add Romesh Abeysuriya's email — Burnet address unconfirmed]
+      affiliations:
+        - Burnet Institute, Melbourne, Australia
   keywords:
-    - terraforming
-    - desert
-    - numerical perspective
-  # Add the abbreviations that you use in your paper here
+    - AI evaluation
+    - agent-based model
+    - disease modeling
+    - Starsim
+    - Sciris
+    - Inspect.ai
+    - SciCode
+    - Claude
   abbreviations:
-    MyST: Markedly Structured Text
+    MCP: Model Context Protocol
+    LLM: Large Language Model
   # It is possible to explicitly ignore the `doi-exists` check for certain citation keys
   error_rules:
     - rule: doi-exists
       severity: ignore
       keys:
-        - Atr03
-        - terradesert
+        - starsim
+        - sciris
+        - inspectai
+        - scicode
         - jupyter
         - sklearn1
         - sklearn2
