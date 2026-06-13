@@ -21,6 +21,7 @@ exam/
 │       ├── workspaces/aNN/    # agent scratch + figures
 │       └── manifest.yaml      # batch summary
 ├── take_exam.py
+├── metadata.md                # field-by-field reference for .info files
 └── README.md
 ```
 
@@ -105,7 +106,8 @@ files are written there, named by answer id (`q01` → `a01`):
   input, and (truncated) tool results.
 - **`.info`** — YAML metadata: start/end/elapsed time, token usage, cost, model,
   effort, enabled tools, turn/tool counts, session id, the SDK init snapshot,
-  Starsim/Python versions, and status.
+  Starsim/Python versions, and status. See [`metadata.md`](metadata.md) for a
+  field-by-field reference.
 
 `manifest.yaml` summarizes the whole batch (handy for the future marker).
 Per-question scratch work (`.py` scripts, saved figures, the agent's own
