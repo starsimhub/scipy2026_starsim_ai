@@ -3504,7 +3504,7 @@ requires-dist = [
     { name = "openai", specifier = ">=2.21.0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "seaborn", specifier = ">=0.13.2" },
-    { name = "starsim", specifier = ">=3.1.1" },
+    { name = "starsim", specifier = ">=3.3.4" },
     { name = "streamlit", specifier = ">=1.54.0" },
 ]
 
@@ -3518,7 +3518,7 @@ docs = [
 
 [[package]]
 name = "sciris"
-version = "3.2.6"
+version = "3.2.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -3542,9 +3542,9 @@ dependencies = [
     { name = "xlsxwriter" },
     { name = "zstandard" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/66/d4dca24edbea3e59957c207914241db05474e9b8156a1f07829bb596daab/sciris-3.2.6.tar.gz", hash = "sha256:86323196481ca5e1e805842028e3d02be47346a31ca54713260a180efcdb82d6", size = 3208857, upload-time = "2026-02-12T13:08:55.468Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b7/62/c96ce0e7c9dec13f1e25fd5a70b0f3bb0d5b6f475e7fbb0cf884b3968b48/sciris-3.2.9.tar.gz", hash = "sha256:e2b2b5f67f5b8759ff02462180a12e0160fcd77c095689d1e5d629b673720495", size = 3206366, upload-time = "2026-03-06T22:33:21.078Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/47/13/e84106ed9dbaae3a466bf15639e4110f35a705e582554649ba01a2e918c4/sciris-3.2.6-py3-none-any.whl", hash = "sha256:5ab624988028406713613a39edf4a0d3025099ff4a58b6e088c3efa90378b150", size = 258443, upload-time = "2026-02-12T13:08:53.75Z" },
+    { url = "https://files.pythonhosted.org/packages/13/dd/dd8239d8f6cc8e758600643a9f8e234a1ed8def948b2208846ce06f37b93/sciris-3.2.9-py3-none-any.whl", hash = "sha256:1f53a4b103d8d07d1eb3c29d7567219e37034e97841835e53299d46207f97189", size = 258760, upload-time = "2026-03-06T22:33:19.252Z" },
 ]
 
 [[package]]
@@ -3708,7 +3708,7 @@ wheels = [
 
 [[package]]
 name = "starsim"
-version = "3.1.1"
+version = "3.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
@@ -3721,9 +3721,9 @@ dependencies = [
     { name = "sciris" },
     { name = "seaborn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8d/2d/d76f449e9472ce65dc37ca0e03d9ac0ccf793e21ad965a79373816a1dc0c/starsim-3.1.1.tar.gz", hash = "sha256:67ecb9694b6cc2b305f955d2a7ca2f5abbfa7de45b6370983800603a5166a41a", size = 1601577, upload-time = "2026-02-19T03:59:53.704Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5b/ef/8dfdc6c0e48615255a5c2f5a93a8dd6fac983f148ce2751c5c317e80dfbf/starsim-3.3.4.tar.gz", hash = "sha256:26cc397bdbffd6cc8b327b72bf8026aa7dac2f654474de4aaf863b8d9fd23af6", size = 1639111, upload-time = "2026-05-22T02:07:03.345Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/62/50bc047cca2a8284e57f8b5d194fc6e51c1b496dc7f35218d11f4231acd5/starsim-3.1.1-py3-none-any.whl", hash = "sha256:54afdf79d2c5d0d6b809b2996464e47484d6b4b034927fcfbe5a75b19acfb552", size = 944373, upload-time = "2026-02-19T03:59:51.094Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/71/01014d49c692d959b04f3a42e21a9529b4526f6a4767aa48f4993dbf2769/starsim-3.3.4-py3-none-any.whl", hash = "sha256:67234878cfc4bdd23a46e0be421f609b824f8aec9feeafb274abb63167a45f32", size = 985760, upload-time = "2026-05-22T02:07:01.446Z" },
 ]
 
 [[package]]
