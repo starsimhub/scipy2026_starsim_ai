@@ -57,7 +57,9 @@ import argparse
 import asyncio
 import json
 import platform
+import shutil
 import sys
+import tempfile
 import time
 import traceback
 from dataclasses import dataclass
@@ -130,14 +132,18 @@ SYSTEM_PROMPT = (
 SUBMIT_INSTRUCTIONS = """\
 # How to submit your answer
 
-- Use your current working directory as scratch space: write `.py` scripts and
+- Your working directory is `{workspace}`. Do ALL of your work there — write
+  `.py` scripts, save figures, and write your answer inside that directory.
+  Use relative paths (or paths under `{workspace}`); do NOT write anywhere
+  outside `{workspace}`, as files written elsewhere will NOT be graded.
+- Use your working directory as scratch space: write `.py` scripts and
   run them (e.g. `python solve.py`) to develop and verify your code and outputs
   before committing to a final answer. Run things as many times as you need.
 - When a sub-part asks for a plot, generate it and save it to a file with
   `plt.savefig(...)` (do NOT call `plt.show()`); reference the saved figure in
   your answer.
 - When you are completely finished, write your COMPLETE answer to a single
-  Markdown file named exactly `answer.md` in your current working directory.
+  Markdown file at exactly `{workspace}/answer.md`.
   The contents of `answer.md` are what will be graded, so it must stand on its
   own and answer every sub-part, following the exam instructions above
   (runnable ```python``` code blocks followed by text explanations).
@@ -398,9 +404,10 @@ def build_options(cfg: RunConfig, workspace: Path) -> ClaudeAgentOptions:
     return opts
 
 
-def build_prompt(cfg: RunConfig, question: QuestionSpec) -> str:
+def build_prompt(cfg: RunConfig, question: QuestionSpec, workspace: Path) -> str:
     """Assemble the user prompt: instructions + question + submit directive."""
     question_text = question.path.read_text(encoding="utf-8").strip()
+    submit = SUBMIT_INSTRUCTIONS.strip().format(workspace=workspace)
     return "\n".join(
         [
             "# Exam instructions",
@@ -415,7 +422,7 @@ def build_prompt(cfg: RunConfig, question: QuestionSpec) -> str:
             "",
             "---",
             "",
-            SUBMIT_INSTRUCTIONS.strip(),
+            submit,
             "",
         ]
     )
@@ -444,11 +451,19 @@ async def run_question(
         md_path = run_dir / f"{stem}.md"
         log_path = run_dir / f"{stem}.log"
         info_path = run_dir / f"{stem}.info"
-        workspace = run_dir / "workspaces" / stem
-        workspace.mkdir(parents=True, exist_ok=True)
+        # Archival workspace: where this question's artifacts are stored for
+        # later analysis (kept inside the run directory).
+        archive_ws = run_dir / "workspaces" / stem
+        archive_ws.mkdir(parents=True, exist_ok=True)
 
-        opts = build_options(cfg, workspace)
-        prompt = build_prompt(cfg, question)
+        # Isolated working directory: the agent runs in a fresh temp directory
+        # OUTSIDE the repo, so it cannot read the question keys or prior runs'
+        # answers under exam/answers/* (which would contaminate scoring). The
+        # contents are copied into archive_ws once the run completes.
+        work_dir = Path(tempfile.mkdtemp(prefix=f"exam_{cfg.slug}_{stem}_"))
+
+        opts = build_options(cfg, work_dir)
+        prompt = build_prompt(cfg, question, work_dir)
 
         tr = Transcript(log_path)
         tr.rule(f"EXAM TRANSCRIPT — {question.title}")
@@ -461,7 +476,8 @@ async def run_question(
             f"plugin:      {cfg.plugin}\n"
             f"context_1m:  {cfg.context_1m}\n"
             f"max_turns:   {cfg.max_turns}\n"
-            f"workspace:   {workspace}\n"
+            f"work_dir:    {work_dir} (isolated)\n"
+            f"archive:     {archive_ws}\n"
         )
 
         start_dt = datetime.now()
@@ -573,11 +589,48 @@ async def run_question(
             print(f"  ✖ {question.qid}: FAILED — {error_str}", flush=True)
 
         # ----- resolve the answer -----
-        ws_answer = workspace / "answer.md"
+        ws_answer = work_dir / "answer.md"
         answer_text = ""
+        recovered_from: Path | None = None
+        if not (ws_answer.exists() and ws_answer.stat().st_size > 0):
+            # The agent may have written answer.md in a subdirectory of its
+            # working directory rather than the root. Recover the most recent
+            # one. (We only search the agent's own isolated working directory,
+            # so we can never pick up another run's or agent's answer.)
+            candidates = sorted(
+                (
+                    p
+                    for p in work_dir.rglob("answer.md")
+                    if p.is_file() and p.stat().st_size > 0
+                ),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )
+            if candidates:
+                ws_answer = candidates[0]
+                recovered_from = ws_answer
+
         if ws_answer.exists() and ws_answer.stat().st_size > 0:
             answer_text = ws_answer.read_text(encoding="utf-8")
-            md_path.write_text(answer_text, encoding="utf-8")
+            if recovered_from is not None:
+                rel = recovered_from.relative_to(work_dir)
+                tr.event(
+                    "WARNING",
+                    f"answer.md not at workspace root; recovered from {rel}",
+                )
+                print(
+                    f"  ⚠ {question.qid}: recovered answer.md from {rel}",
+                    flush=True,
+                )
+                if status == "completed":
+                    status = "recovered_answer_file"
+                md_path.write_text(
+                    f"<!-- NOTE: answer.md was recovered from {rel}, not the "
+                    "expected workspace root. -->\n\n" + answer_text,
+                    encoding="utf-8",
+                )
+            else:
+                md_path.write_text(answer_text, encoding="utf-8")
         else:
             fallback = (result_text or "\n".join(collected_text)).strip()
             if fallback:
@@ -597,6 +650,14 @@ async def run_question(
                 md_path.write_text(
                     "<!-- NOTE: the agent produced no answer. -->\n", encoding="utf-8"
                 )
+
+        # ----- archive the isolated working directory, then clean it up -----
+        try:
+            shutil.copytree(work_dir, archive_ws, dirs_exist_ok=True)
+        except Exception as exc:  # pragma: no cover - archival is best-effort
+            tr.event("WARNING", f"failed to archive working directory: {exc}")
+        finally:
+            shutil.rmtree(work_dir, ignore_errors=True)
 
         # ----- timing + metadata -----
         end_dt = datetime.now()
@@ -649,7 +710,7 @@ async def run_question(
             "answer_file": md_path.name,
             "log_file": log_path.name,
             "info_file": info_path.name,
-            "workspace": str(workspace.relative_to(run_dir)),
+            "workspace": str(archive_ws.relative_to(run_dir)),
             "init": yaml_safe(init_data),
         }
         info_path.write_text(
