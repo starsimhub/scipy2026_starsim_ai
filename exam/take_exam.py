@@ -12,12 +12,12 @@ where ``<slug>`` is the session start time (e.g.
 ``exam/answers/jun13.0740_sonnet-medium-noskills/``). For every question, an
 agent writes three sibling files there, named by answer id (``q01`` → ``a01``):
 
-  - ``aNN.md``    — the graded answer (Markdown)
-  - ``aNN.log``   — the full transcript (thinking, tool calls, results)
-  - ``aNN.info``  — run metadata (YAML: timing, tokens, cost, model, tools…)
+  - ``answerNN.md``    — the graded answer (Markdown)
+  - ``answerNN.log``   — the full transcript (thinking, tool calls, results)
+  - ``answerNN.info``  — run metadata (YAML: timing, tokens, cost, model, tools…)
 
 Scratch work (the agent's `.py` files, figures, etc.) is preserved under
-``workspaces/aNN/`` within the run directory, and a batch-level
+``workspaces/answerNN/`` within the run directory, and a batch-level
 ``manifest.yaml`` summarizes the whole run for the (separate) marking agent.
 
 Progress is followable live: each agent's ``.log`` is written incrementally
@@ -167,7 +167,7 @@ class QuestionSpec:
     """A single exam question to be answered."""
 
     qid: str  # e.g. "q01"
-    aid: str  # e.g. "a01"
+    aid: str  # e.g. "answer01"
     title: str  # e.g. "q01_basics"
     path: Path  # path to the question Markdown file
 
@@ -265,7 +265,7 @@ def discover_questions(questions_dir: Path, selected: list[str] | None) -> list[
     specs: list[QuestionSpec] = []
     for f in files:
         qid = f.stem.split("_")[0]  # "q01_basics" -> "q01"
-        aid = "a" + qid[1:] if qid.startswith("q") else qid
+        aid = "answer" + qid[1:] if qid.startswith("q") else qid
         specs.append(QuestionSpec(qid=qid, aid=aid, title=f.stem, path=f))
 
     if selected and "all" not in selected:
@@ -447,7 +447,7 @@ async def run_question(
     """
     async with sem:
         run_dir = cfg.run_dir
-        stem = question.aid  # files are aNN.md / aNN.log / aNN.info
+        stem = question.aid  # files are answerNN.md / answerNN.log / answerNN.info
         md_path = run_dir / f"{stem}.md"
         log_path = run_dir / f"{stem}.log"
         info_path = run_dir / f"{stem}.info"

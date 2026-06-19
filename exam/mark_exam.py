@@ -7,28 +7,30 @@ official marking scheme** and records a score with per-criterion rationale.
 
 Given an answer run directory (``exam/answers/<slug>_<model>-<effort>-<config>/``
 produced by ``take_exam.py``), this launches **one autonomous marking agent per
-answer** (``a01``–``a04``) and runs them in parallel. Each marker is handed,
-inline in its prompt:
+answer** (``answer01``–``answer04``) and runs them in parallel. Each marker is
+handed, inline in its prompt:
 
   - the exam question (``questions/qNN_*.md``),
   - the official solution and marking scheme (``solutions/sNN_*.md``), and
-  - the student's submitted answer (the top-level ``aNN….md`` — the file the
-    taker designates as graded).
+  - the student's submitted answer (the top-level ``answerNN….md`` — the file
+    the taker designates as graded).
 
 The marker's working directory is the answer's scratch workspace
-(``workspaces/aNN…/``), so the figures the answer references resolve by their
-relative paths and can be opened with ``Read``. The agent may also run the
+(``workspaces/answerNN…/``), so the figures the answer references resolve by
+their relative paths and can be opened with ``Read``. The agent may also run the
 student's code to verify claims, but it grades the submission as written and
 awards only the marks the scheme defines.
 
-For every answer (``a01`` → ``m01``) the marker writes three sibling files into
-the **same run directory** as the answer:
+For every answer (``answer01`` → ``marked01``) the marker writes three sibling
+files into the **same run directory** as the answer:
 
-  - ``mNN….md``    — the marked answer: the scheme reproduced with each
-                     criterion checked off, a one-line justification per
-                     criterion, subtotals, and a grand total.
-  - ``mNN….log``   — the full transcript (thinking, tool calls, results).
-  - ``mNN….info``  — run metadata (YAML), including the awarded/possible score.
+  - ``markedNN….md``    — the student's full answer reproduced verbatim, with
+                          the marking scheme (criteria checked off, a one-line
+                          justification per criterion, and a subtotal) appended
+                          at the bottom of each question, plus a grand total.
+  - ``markedNN….log``   — the full transcript (thinking, tool calls, results).
+  - ``markedNN….info``  — run metadata (YAML), including the awarded/possible
+                          score.
 
 A batch-level ``marking_manifest.yaml`` summarizes all questions: per-question
 scores and the exam grand total and percentage.
@@ -46,7 +48,7 @@ Examples:
         --model opus --effort high
 
     # Mark only two answers, pointing at a non-default solutions folder
-    uv run python exam/mark_exam.py --answers a01,a03 \\
+    uv run python exam/mark_exam.py --answers answer01,answer03 \\
         --solutions-dir /path/to/starsim_exam/solutions
 
     # Preview what would be marked without calling the model
@@ -182,20 +184,50 @@ marking scheme**, and record the result.
 
 Write BOTH of the following files in your current working directory:
 
-### 1. `marked.md` — the human-readable marked answer
+### 1. `marked.md` — the student's full answer, annotated with marks
 
-Structure it as:
+This file must contain the student's complete answer with your marks appended
+at the bottom of each question, so a reader can check your marking against what
+the student actually wrote without opening a second file. Structure it as:
 
 1. A title and a short summary: the grand total as `awarded / possible`, the
    percentage, and a per-section table (section id, title, awarded/possible).
-2. For each sub-question, in order: its id, title, and `[N marks]`, followed by
-   the scheme's criteria rewritten with the outcome filled in — `- [x]` if
-   awarded, `- [ ]` if not — each annotated with the awarded mark and a
-   one-sentence justification, e.g.:
-   `- [x] Correct specification of network: **2/2** — uses ss.RandomNet(n_contacts=8).`
-   Close each sub-question with `**Subtotal: X/Y**`.
+2. For each sub-question, in order:
+   a. Its id, title, and `[N marks]`.
+   b. The student's answer for that sub-question, reproduced VERBATIM —
+      including all prose, ```` ```python ```` code blocks, and figure
+      references. Do NOT summarise, abridge, or rewrite the student's content.
+      You may, however, add light inline MARKER annotations pointing out where
+      the answer is right or wrong (see below).
+   c. A `**Marks**` block at the BOTTOM of that sub-question: the scheme's
+      criteria rewritten with the outcome filled in — `- [x]` if awarded,
+      `- [ ]` if not — each annotated with the awarded mark and a one-sentence
+      justification, e.g.:
+      `- [x] Correct specification of network: **2/2** — uses ss.RandomNet(n_contacts=8).`
+      Close the block with `**Subtotal: X/Y**`.
 3. A closing line per section (`**Section 1.2 total: X/Y**`) and a final
    `**Grand total: X/Y (Z%)**`.
+
+### Inline MARKER annotations
+
+While reproducing the answer, annotate it inline to flag exactly where it is
+correct or where it goes wrong — this is what makes the marking easy to check.
+Keep annotations MINIMAL: a few targeted notes per sub-question, NOT a comment
+on every line or paragraph.
+
+- Inside ```` ```python ```` code blocks, add a comment on the relevant line,
+  prefixed with `# MARKER:`. For example:
+  `beta = 0.05  # MARKER: should be beta=0.8` or `# MARKER: correct vectorisation`.
+- In prose, append an italic note at the end of the relevant sentence or
+  paragraph, e.g. `*[MARKER: this explanation is incorrect — S is conserved]*`
+  or `*[MARKER: correct]*`.
+
+These are illustrative examples of the style and placement, not a prescriptive
+format — annotate wherever it genuinely helps a reader see your reasoning.
+
+Annotating the answer does not change the marks: grade the submission exactly
+as written. The reproduction and annotations exist only so the marking can be
+verified at a glance.
 
 ### 2. `score.yaml` — the machine-readable score
 
@@ -238,9 +270,9 @@ class MarkTask:
 
     num: str  # e.g. "01"
     qid: str  # e.g. "q01"
-    answer_stem: str  # e.g. "a01"
-    marker_stem: str  # e.g. "m01"
-    answer_path: Path  # the graded answer Markdown (top-level aNN….md)
+    answer_stem: str  # e.g. "answer01"
+    marker_stem: str  # e.g. "marked01"
+    answer_path: Path  # the graded answer Markdown (top-level answerNN….md)
     question_path: Path  # questions/qNN_*.md
     solution_path: Path  # solutions/sNN_*.md
     workspace: Path  # the answer's scratch dir (figures live here)
@@ -317,34 +349,36 @@ def _find_one(directory: Path, patterns: list[str]) -> Path | None:
 def discover_mark_tasks(cfg: MarkConfig, selected: list[str] | None) -> list[MarkTask]:
     """Find answers in the run directory and pair each with its solution.
 
-    Answer files are the top-level ``aNN….md`` in the run directory (excluding
-    any previously written ``mNN….md`` marked files). Each is matched to its
-    question (``qNN_*.md``) and solution (``sNN_*.md``) by leading number.
+    Answer files are the top-level ``answerNN….md`` in the run directory
+    (excluding any previously written ``markedNN….md`` marked files). Each is
+    matched to its question (``qNN_*.md``) and solution (``sNN_*.md``) by
+    leading number.
 
     Args:
         cfg: The marking configuration (run/solutions/questions dirs).
-        selected: Optional id filters (``a01``/``q01``/``01``); ``None`` or
+        selected: Optional id filters (``answer01``/``q01``/``01``); ``None`` or
             ``"all"`` marks every answer found.
 
     Returns:
         A sorted list of [`MarkTask`][exam.mark_exam.MarkTask].
     """
     answer_files = sorted(
-        f for f in cfg.run_dir.glob("a*.md") if re.match(r"^a\d", f.stem)
+        f for f in cfg.run_dir.glob("answer*.md") if re.match(r"^answer\d", f.stem)
     )
     if not answer_files:
         raise FileNotFoundError(
-            f"No answer files (a*.md) found in {cfg.run_dir}. "
+            f"No answer files (answer*.md) found in {cfg.run_dir}. "
             "Point --run at a directory produced by take_exam.py."
         )
 
     wanted = None
     if selected and "all" not in selected:
-        wanted = {s.lower().lstrip("aq") for s in selected}
+        # Accept any of "answer01" / "a01" / "q01" / "01" by keeping the digits.
+        wanted = {re.sub(r"\D", "", s) for s in selected}
 
     tasks: list[MarkTask] = []
     for af in answer_files:
-        m = re.match(r"^a(\d+)", af.stem)
+        m = re.match(r"^answer(\d+)", af.stem)
         if not m:
             continue
         num = m.group(1)
@@ -376,7 +410,7 @@ def discover_mark_tasks(cfg: MarkConfig, selected: list[str] | None) -> list[Mar
                 num=num,
                 qid=f"q{num}",
                 answer_stem=af.stem,
-                marker_stem="m" + af.stem[1:],
+                marker_stem=f"marked{num}",
                 answer_path=af,
                 question_path=question_path,
                 solution_path=solution_path,
@@ -853,7 +887,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--answers",
         default="all",
-        help="Comma-separated answer ids to mark (e.g. a01,a03 or q01,q03 or 01,03) or 'all'.",
+        help="Comma-separated answer ids to mark (e.g. answer01,answer03 or q01,q03 or 01,03) or 'all'.",
     )
     p.add_argument(
         "--model",
