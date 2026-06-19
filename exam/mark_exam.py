@@ -39,20 +39,23 @@ Progress is followable live, exactly as with the taker: each marker's ``.log``
 is written incrementally (``tail -f`` it), and a heartbeat prints a per-agent
 snapshot every 30 s.
 
+The path to the solutions / marking schemes must always be supplied explicitly
+via --solutions-dir; it is not bundled with this repo.
+
 Examples:
     # Mark the most recent answer run with the default (sonnet) marker
-    uv run python exam/mark_exam.py
+    uv run python exam/mark_exam.py --solutions-dir /path/to/starsim_exam/solutions
 
     # Mark a specific run, using opus at high effort for stricter judgement
     uv run python exam/mark_exam.py --run jun13.0806_sonnet-medium-noskills \\
-        --model opus --effort high
+        --solutions-dir /path/to/starsim_exam/solutions --model opus --effort high
 
-    # Mark only two answers, pointing at a non-default solutions folder
+    # Mark only two answers
     uv run python exam/mark_exam.py --answers answer01,answer03 \\
         --solutions-dir /path/to/starsim_exam/solutions
 
     # Preview what would be marked without calling the model
-    uv run python exam/mark_exam.py --dry-run
+    uv run python exam/mark_exam.py --solutions-dir /path/to/starsim_exam/solutions --dry-run
 
 Run ``uv run python exam/mark_exam.py --help`` for all options.
 """
@@ -93,7 +96,6 @@ from claude_agent_sdk import (
 # the module also clears the CLAUDECODE marker and records STARSIM_VERSION.
 from take_exam import (
     EXAM_DIR,
-    PROJECT_ROOT,
     DEFAULT_QUESTIONS_DIR,
     DEFAULT_OUTPUT_DIR,
     STARSIM_PLUGIN_DIR,
@@ -118,9 +120,8 @@ from take_exam import (
 # Paths and constants
 # ---------------------------------------------------------------------------
 
-# The official solutions live in the sibling ``starsim_exam`` repo by default;
-# override with --solutions-dir for any other layout.
-DEFAULT_SOLUTIONS_DIR = PROJECT_ROOT.parent / "starsim_exam" / "solutions"
+# The official solutions / marking schemes are not bundled with this repo; the
+# caller must point at them explicitly via the required --solutions-dir option.
 
 # Files the marker writes in its workspace; copied/parsed by the runner.
 MARKED_FILENAME = "marked.md"
@@ -875,8 +876,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--solutions-dir",
         type=Path,
-        default=DEFAULT_SOLUTIONS_DIR,
-        help="Directory containing sNN_*.md solutions / marking schemes.",
+        required=True,
+        help="Directory containing sNN_*.md solutions / marking schemes (required).",
     )
     p.add_argument(
         "--questions-dir",
