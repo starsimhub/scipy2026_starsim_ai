@@ -7,14 +7,7 @@ abstract: |
 
 ## Introduction
 
-Scientists are often decidedly unscientific about choosing AI tools to help
-them write code. They know these tools are helpful, but except for trying out
-different models, they rarely perform controlled evaluations to check whether
-other changes to their AI workflow produce significantly better results. This
-is because writing and executing these evaluations is typically time-consuming,
-the results of the evaluations are difficult to interpret and quantify, and AI
-workflows and tooling are evolving rapidly. Here we describe our process for
-quantitatively testing our assumptions about how to build a good AI assistant.
+Scientists are often decidedly unscientific about choosing AI tools to help them write code. They know these tools are helpful, but except for trying out different models, they rarely perform controlled evaluations to check whether other changes to their AI workflow produce significantly better results. This is because writing and executing these evaluations is typically time-consuming, the results of the evaluations are difficult to interpret and quantify, and AI workflows and tooling are evolving rapidly. Here we describe our process for quantitatively testing our assumptions about how to build a good AI assistant.
 
 **Todo:**
 - [ ] Cite other benchmarking/eval suites, e.g. Terminal Bench
@@ -23,32 +16,14 @@ quantitatively testing our assumptions about how to build a good AI assistant.
 
 ### Starsim
 
-Our team models infectious diseases using [Starsim](https://starsim.org/)
-[@starsim], a high-performance agent-based modeling library built on NumPy
-[@numpy], SciPy [@scipy], and Numba. Specifically, Starsim includes modules
-for different diseases, transmission networks, and interventions (such as
-vaccines). Starsim has been used to model domains ranging from family planning
-and primary health care to HIV and tuberculosis. Since the diseases themselves
-are often very complicated, the Starsim models built to model them can also be
-very complicated. This presents a challenge to AI tools due to limited context
-windows and out-of-date training data.
+Our team models infectious diseases using [Starsim](https://starsim.org/) [@starsim], a high-performance agent-based modeling library built on NumPy [@numpy], SciPy [@scipy], and Numba. Specifically, Starsim includes modules for different diseases, transmission networks, and interventions (such as vaccines). Starsim has been used to model domains ranging from family planning and primary health care to HIV and tuberculosis. Since the diseases themselves are often very complicated, the Starsim models built to model them can also be very complicated. This presents a challenge to AI tools due to limited context windows and out-of-date training data.
 
 **Todo:**
 - [ ] Say more about Starsim
 
 ### Starsim-AI
 
-We created a set of agent tools to improve domain-specific performance,
-called [Starsim-AI](https://github.com/starsimhub/starsim_ai). Specifically,
-we added Model Context Protocol (MCP) servers for Starsim and
-[Sciris](https://docs.sciris.org/en/latest/) [@sciris] (a scientific Python
-library used widely in the codebase). We also created a set of "skills" for
-Starsim, which consist of problem-solving and feature-oriented Markdown files
-covering topics including statistical distributions, simulation construction,
-and calibration. These skills were created by Claude Code based on the Starsim
-[tutorials](https://docs.starsim.org/tutorials) and
-[user guide](https://docs.starsim.org/user_guide). They were then manually
-reviewed and revised by Starsim core developers for accuracy and completeness.
+We created a set of agent tools to improve domain-specific performance, called [Starsim-AI](https://github.com/starsimhub/starsim_ai). Specifically, we added Model Context Protocol (MCP) servers for Starsim and [Sciris](https://docs.sciris.org/en/latest/) [@sciris] (a scientific Python library used widely in the codebase). We also created a set of "skills" for Starsim, which consist of problem-solving and feature-oriented Markdown files covering topics including statistical distributions, simulation construction, and calibration. These skills were created by Claude Code based on the Starsim [tutorials](https://docs.starsim.org/tutorials) and [user guide](https://docs.starsim.org/user_guide). They were then manually reviewed and revised by Starsim core developers for accuracy and completeness.
 
 **Todo:**
 - [ ] Say more about the individual skills
