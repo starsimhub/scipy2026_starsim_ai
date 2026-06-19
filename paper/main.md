@@ -7,6 +7,8 @@ abstract: |
 
 ## Introduction
 
+**NOTE:** This manuscript is still in draft form and is **not** ready for peer review.
+
 Scientists are often decidedly unscientific about choosing AI tools to help them write code. They know these tools are helpful, but except for trying out different models, they rarely perform controlled evaluations to check whether other changes to their AI workflow produce significantly better results. This is because writing and executing these evaluations is typically time-consuming, the results of the evaluations are difficult to interpret and quantify, and AI workflows and tooling are evolving rapidly. Here we describe our process for quantitatively testing our assumptions about how to build a good AI assistant.
 
 A growing number of benchmarks evaluate the coding ability of LLMs and agents, ranging from resolving real-world software-engineering issues (SWE-bench [@swebench]) to completing open-ended tasks in a terminal environment (Terminal-Bench [@terminalbench]) and implementing routines for scientific computing (SciCode [@scicode]). These benchmarks have driven rapid progress, but they largely target widely-used, general-purpose libraries that are well represented in model training data. They say little about how well agents handle specialized scientific software — code that is comparatively rare in training corpora, evolves quickly, and demands domain expertise to use correctly. This is precisely the regime in which most research software lives, and the one we set out to measure.
