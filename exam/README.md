@@ -12,7 +12,7 @@ has two halves:
 exam/
 ├── questions/                 # the exam (source of truth)
 │   ├── exam_instructions.md
-│   └── qNN_*.md               # one file per question (q01–q04)
+│   └── qNN_*.md               # one file per question (q01–q05)
 ├── answers/                   # generated; one subdir per run
 │   └── <slug>_<model>-<effort>-<config>/   # e.g. jun13.0740_sonnet-medium-noskills
 │       ├── aNN.md             # graded answer
@@ -28,7 +28,7 @@ exam/
 ## Exam-taker
 
 `take_exam.py` launches **one autonomous agent per question, in parallel**
-(four agents for `q01`–`q04`). Each agent:
+(five agents for `q01`–`q05`). Each agent:
 
 - has a Python environment and **must run code** to develop and verify answers
   (`Bash`, `Read`, `Write`, `Edit`, … are always available);
