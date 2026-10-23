@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -509,18 +509,21 @@ wheels = [
 
 [[package]]
 name = "claude-agent-sdk"
-version = "0.1.38"
+version = "0.2.173"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
+    { name = "jsonschema" },
     { name = "mcp" },
+    { name = "sniffio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5a/55/8663db06e6c724d1fa540e1bb86aee54f30cbb2979ad0088c97522f08363/claude_agent_sdk-0.1.38.tar.gz", hash = "sha256:1a3493f856de84ea86802457bfe1deaf14da2768627f7b1602618f866390d5e8", size = 61615, upload-time = "2026-02-18T21:57:00.232Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/ed/8e6fb36f787424999a0981d52fb4480aceb106046754b615c5daab634f30/claude_agent_sdk-0.2.173.tar.gz", hash = "sha256:b989622735b3dd989cd830c9d2a9c10955090793288d36aabfb3bada873ac50b", size = 398742, upload-time = "2026-10-22T23:13:59.827Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/26/8890529d9bf2415836fff55bbec1860a1b676abe06bd99632d5c568f9b68/claude_agent_sdk-0.1.38-py3-none-macosx_11_0_arm64.whl", hash = "sha256:77a4ba1a78bb16c67152c35692e7d070e7e09d311f95abdc02e913f762109910", size = 55079940, upload-time = "2026-02-18T21:56:45.019Z" },
-    { url = "https://files.pythonhosted.org/packages/ab/5f/aab457f0e2c7dc3d6f8142afdb56b1ffae13e568e2187edb51d0a358ea2f/claude_agent_sdk-0.1.38-py3-none-manylinux_2_17_aarch64.whl", hash = "sha256:46aeb89490813a27c8bc4e7b0d58d7dc16a5718890b20ef1e3b8a1adb511d9cc", size = 69825653, upload-time = "2026-02-18T21:56:49.043Z" },
-    { url = "https://files.pythonhosted.org/packages/d4/12/c88aee78715e2b5af833b32f6d2cbd5a7431fad8e55572dab8742049771a/claude_agent_sdk-0.1.38-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:74d3d1c10069fdaceb8ddf75c57c90d05881a2a88136dff87b023def42d09837", size = 70428290, upload-time = "2026-02-18T21:56:53.39Z" },
-    { url = "https://files.pythonhosted.org/packages/31/74/122b4445eaa8c777e17ff700c5e4ec39662ad3a2c597df9f61afd9b43b72/claude_agent_sdk-0.1.38-py3-none-win_amd64.whl", hash = "sha256:51f51972270b5c3be86037fdaa333942d45f0a11cfd437e834a2242b0612a96b", size = 72751005, upload-time = "2026-02-18T21:56:57.515Z" },
+    { url = "https://files.pythonhosted.org/packages/60/f2/0f0c975177753a7b43c8fe0429ed3e945beba8e310e32dfc2ef4b78053b9/claude_agent_sdk-0.2.173-py3-none-macosx_11_0_arm64.whl", hash = "sha256:f2e3a7ec6ab16c1514950fd35424c160db3c1dfe0fdaa7fd6727ca50e613a71f", size = 116414957, upload-time = "2026-10-22T23:14:05.704Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/3b/a0d182b02435342334d8a8ea5c8e6b039ddcca62047fd0849c5a82d8a66e/claude_agent_sdk-0.2.173-py3-none-macosx_11_0_x86_64.whl", hash = "sha256:fee3f7ed59708756552055aca95d4d3331ba60bc34733004c0ab4a252fd15d8c", size = 122113139, upload-time = "2026-10-22T23:14:11.104Z" },
+    { url = "https://files.pythonhosted.org/packages/04/ec/54fa9f446695be76d5311b108f2dcca2bee7d138b6521231bc999de81e20/claude_agent_sdk-0.2.173-py3-none-manylinux_2_17_aarch64.whl", hash = "sha256:4a7c80e4d506d21d731b41c662e57e67b9f3b3e82c1b08d7bcc0bad304af48a2", size = 126143628, upload-time = "2026-10-22T23:14:17.309Z" },
+    { url = "https://files.pythonhosted.org/packages/45/3a/ba20ed810176853b2de4cb6f645df2bb863bfc5d259d8475540731775f51/claude_agent_sdk-0.2.173-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:e282276b4c20648d33e4e4a9ecb98f6ce531f10206e9078171231e2d1931bb8b", size = 126509246, upload-time = "2026-10-22T23:14:24.509Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/da/452e42c83b5ffd5837d61e16b6ae62eb1f20b9a99e003ed232f25931f12a/claude_agent_sdk-0.2.173-py3-none-win_amd64.whl", hash = "sha256:6fe2de80a7f6f66f98f32f287fdff5d4b6f2a3b80970b591b97f20ee0f675365", size = 129994820, upload-time = "2026-10-22T23:14:31.193Z" },
 ]
 
 [[package]]
@@ -939,14 +942,14 @@ wheels = [
 
 [[package]]
 name = "gitpython"
-version = "3.1.57"
+version = "3.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gitdb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/0d/132ed135c871b6bf91adf16a0e43797cd535b81d4973b5d09291c54fc5ee/gitpython-3.1.57.tar.gz", hash = "sha256:c493ec57c0ef6b19743798b6a5af859c71814b524e7e6f97baa2f8e658961488", size = 225898, upload-time = "2026-07-26T07:33:26.351Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/ff/fee293f1ec3e1b64db6eb270e00964f29c086d769201474cedb8d1608930/gitpython-3.2.1.tar.gz", hash = "sha256:0f1229ec5c057bdabdeeda8bda4f17bda679ab33dbccc00f24e6a480553c8613", size = 241688, upload-time = "2026-10-14T12:20:20.589Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/41/6e/2139de986d9c7c3ac86f1f8be43858ce90bdfe2f7175e6c80c650ba15242/gitpython-3.1.57-py3-none-any.whl", hash = "sha256:4ccf7d73c10f5c9e76043fbb2675ac5a1b3ff5b41e648f56bcbed5f63792ecaf", size = 217151, upload-time = "2026-07-26T07:33:24.838Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/50/2a923c4dc02522ff9567f07c67ed1deca6d5fa9474f4708168b8088dfa37/gitpython-3.2.1-py3-none-any.whl", hash = "sha256:d66b0832aa8755c1a84892937282df0befb16c97e5a64aeebd68be9c5e323f53", size = 231548, upload-time = "2026-10-14T12:20:18.844Z" },
 ]
 
 [[package]]
